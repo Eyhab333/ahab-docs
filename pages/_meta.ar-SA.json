@@ -1,0 +1,24 @@
+{
+    "index": {
+      "title" : "الرئيسية"
+    },
+    "contact": {
+      "title" : "تواصل معنا",
+      "type" : "page",
+      "href": "https://www.linkedin.com/in/ahab-fadl/",
+      "newWindow": true
+    },
+    "about": {
+      "title" : "من نحن",
+      "type" : "page",
+      "theme" : {
+        "typesetting": "article"
+      }
+      
+    },
+    "reference" : "المرجع",
+    "---": {
+    "type": "separator"
+  },
+    "projects" : "المشاريع"
+  }

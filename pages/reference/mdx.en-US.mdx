@@ -1,0 +1,89 @@
+# Markdown
+
+## MDX Syntax
+
+MDX is a combination of Markdown and JSX, and regular Markdown syntax can be used for most formatting. What follows is a guide to the Markdown syntax supported by Gatsby. Each section gives the Markdown syntax, the HTML element it creates, and a demonstration of the element.
+
+### Headings
+
+Headings are usually created in Markdown with a set of hash (\#) characters placed before the text for the heading, with a space in between (this space is **required** in Gatsby). The number of hashes corresponds to the level of the heading (i.e., \# corresponds to a first-level heading, or the `<h1>` HTML tag).
+
+| Markdown | HTML |
+| -------- | ---- |
+| `# Heading 1` | `<h1>Heading 1</h1>` |
+| `## Heading 2` | `<h2>Heading 2</h2>` |
+| `### Heading 3` | `<h3>Heading 3</h3>` |
+| `#### Heading 4` | `<h4>Heading 4</h4>` |
+| `##### Heading 5` | `<h5>Heading 5</h5>` |
+| `###### Heading 6` | `<h6>Heading 6</h6>` |
+
+There is alternative syntax for `<h1>` and `<h2>` headings:
+
+| Markdown | HTML |
+| -------- | ---- |
+| `Heading 1` <br /> `===============` | `<h1>Heading 1</h1>` |
+| `Heading 2` <br /> `---------------` | `<h2>Heading 2</h2>` |
+
+### Emphasis
+
+#### Italics
+
+To mark text in *italics*, add an asterisk (\*) or underscore (\_) before and after the text to be formatted.
+
+| Markdown | Alternative | HTML | Output |
+| -------- | ----------- | ---- | ------ |
+| `*italics*` | `_italics_` | `<em>italics</em>` | *italics* |
+
+#### Bold
+
+To mark text in **boldface**, add two asterisks (\*\*) or two underscores (\_\_) before and after the text to be formatted.
+
+| Markdown | Alternative | HTML | Output |
+| -------- | ----------- | ---- | ------ |
+| `**boldface**` | `__boldface__` | `<strong>boldface</strong>` | **boldface** |
+
+#### Bold and italics together
+
+To emphasize text with ***both boldface and italics***, use three asterisks (\*\*\*) or three underscores (\_\_\_) before and after the text to be formatted.
+
+| Markdown | Alternative | HTML | Output |
+| -------- | ----------- | ---- | ------ |
+| `***boldface and italics***` | `___boldface and italics___` | `<strong><em>boldface</em></strong>` | ***boldface and italics*** |
+
+> **Note**
+> To emphasize text with bold or italics in the **middle** of a sentence, use asterisks but not underscores. For example, 
+
+`middle **of** sentence` becomes middle **of** sentence, but
+
+`middle_of_sentence` becomes middle_of_sentence.
+
+The underscores only work when there is spacing before and after the emphasized word.
+
+### Line breaks
+
+To create a line break, follow a line with two spaces and then hit enter.
+
+
+This is the first line.   
+This is the second line.
+
+### Built-ins in Nextra
+
+#### Callout
+
+Nextra includes a couple of built-in components that you can use to better style your content:
+
+import { Callout } from 'nextra/components'
+ 
+<Callout emoji="👾">
+  **Space Invaders** is a 1978 shoot 'em up arcade game developed by Tomohiro
+  Nishikado.
+</Callout>
+
+
+
+
+
+
+
+

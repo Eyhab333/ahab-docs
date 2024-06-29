@@ -1,0 +1,11 @@
+{
+    "mdx" : "MDX",
+    "cplusplus-util-classes" : "C++ Utility Classes",
+    "problem-solving" : "Problem Solving",
+    "algorithms" : "Algorithms",
+    "data-structures" : "Data Structures",
+    "oop" : "OOP",
+    "sql" : "SQL",
+    "restful-api" : "RESTFUL API",
+    "react" : "React"
+}
