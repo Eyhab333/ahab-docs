@@ -1,6 +1,6 @@
 # AHAB DOCS
 
-> **Warning**
+> **Note**
 > This app is a work in progress.
 > See the roadmap below.
 
