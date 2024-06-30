@@ -1,10 +1,10 @@
 {
     "mdx" : "MDX",
     "cplusplus-util-classes" : "C++ Utility Classes",
-    "problem-solving" : "Problem Solving",
-    "algorithms" : "Algorithms",
-    "data-structures" : "Data Structures",
     "oop" : "OOP",
+    "problem-solving" : "Problem Solving",
+    "data-structures" : "Data Structures(C#)",
+    "algorithms" : "Algorithms(C#)",
     "sql" : "SQL",
     "restful-api" : "RESTFUL API",
     "react" : "React"

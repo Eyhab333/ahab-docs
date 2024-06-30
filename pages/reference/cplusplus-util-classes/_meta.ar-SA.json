@@ -1,5 +1,15 @@
 {
     "clsString" : "clsString",
     "clsUtil" : "clsUtil",
-    "clsDate" : "clsDate"
+    "clsDate" : "clsDate",
+    "clsPeriod" : "clsPeriod",
+    "clsInputValidate" : "clsInputValidate",
+    "clsDblLinkedList" : "clsDblLinkedList",
+    "clsDynamicArray" : "clsDynamicArray",
+    "clsMyQueue" : "clsMyQueue",
+    "clsMyQueueArr" : "clsMyQueueArr",
+    "clsMyStack" : "clsMyStack",
+    "clsMyStackArr" : "clsMyStackArr",
+    "clsMyString" : "clsMyString",
+    "clsQueueLine" : "clsQueueLine"
 }
