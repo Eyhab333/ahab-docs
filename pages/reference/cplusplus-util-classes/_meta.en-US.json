@@ -1,3 +1,5 @@
 {
-    "clsString" : "clsString"
+    "clsString" : "clsString",
+    "clsUtil" : "clsUtil",
+    "clsDate" : "clsDate"
 }

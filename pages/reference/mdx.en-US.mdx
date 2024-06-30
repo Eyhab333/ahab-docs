@@ -4,7 +4,208 @@
 
 MDX is a combination of Markdown and JSX, and regular Markdown syntax can be used for most formatting. What follows is a guide to the Markdown syntax supported by Gatsby. Each section gives the Markdown syntax, the HTML element it creates, and a demonstration of the element.
 
-### Headings
+## Syntax Highlighting
+
+````md filename="Markdown"
+```js
+console.log('hello, world')
+```
+````
+
+Results in:
+
+```js
+console.log('hello, world')
+```
+
+### Inlined Code
+
+Inlined syntax highlighting like `let x = 1{:jsx}` is also supported via the
+`{:}` syntax:
+
+```md filename="Markdown"
+Inlined syntax highlighting is also supported `let x = 1{:jsx}` via:
+```
+
+### Highlighting Lines
+
+You can highlight specific lines of code by adding a `{}` attribute to the code
+block:
+
+````md filename="Markdown"
+```js {1,4-5}
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+````
+
+Result:
+
+```js {1,4-5}
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+
+### Highlighting Substrings
+
+You can highlight specific substrings of code by adding a `//` attribute to the
+code block:
+
+````md filename="Markdown"
+```js /useState/
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+````
+
+```js /useState/
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+
+You can highlight only a part of the occurrences of that substring by adding a
+number it: `/str/1`, or multiple: `/str/1-3`, `/str/1,3`.
+
+### Copy Button
+
+By adding a `copy` attribute, a copy button will be added to the code block when
+the user hovers over it:
+
+````md filename="Markdown"
+```js copy
+console.log('hello, world')
+```
+````
+
+Renders:
+
+```js copy
+console.log('hello, world')
+```
+
+You can enable this feature globally by setting `defaultShowCopyCode: true` in
+your Nextra configuration (`next.config.js` file). Once it's enabled globally,
+you can disable it via the `copy=false` attribute.
+
+### Line Numbers
+
+You can add line numbers to your code blocks by adding a `showLineNumbers`
+attribute:
+
+````md filename="Markdown"
+```js showLineNumbers
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+````
+
+Renders:
+
+```js showLineNumbers
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+
+### Filenames and Titles
+
+You can add a filename or a title to your code blocks by adding a `filename`
+attribute:
+
+````md filename="Markdown"
+```js filename="example.js"
+console.log('hello, world')
+```
+````
+
+Renders:
+
+```js filename="example.js"
+console.log('hello, world')
+```
+
+---
+
+## Link
+
+Click [here](/about) to read more.
+
+```md copy
+Click [here](/about) to read more.
+```
+
+Will be equivalent to:
+
+```jsx
+import Link from 'next/link'
+
+Click <Link href="/about">here</Link> to read more.
+```
+
+---
+
+## Image
+
+```mdx
+import Image from 'next/image'
+
+<Image src="/demo.png" alt="Hello" width={500} height={500} />
+```
+
+Static Image
+
+import { Callout } from 'nextra/components'
+
+<Callout>
+  This feature is enabled via `staticImage: true` in the Nextra config by
+  default.
+</Callout>
+
+Nextra supports automatically optimizing your static image imports with the
+Markdown syntax. You do not need to specify the width and height of the image,
+just use the `![]()` Markdown syntax:
+
+```md filename="index.mdx"
+![Hello](/demo.png)
+```
+
+This loads the `demo.png` file inside the `public` folder, and automatically
+wraps it with Next.js `<Image>`.
+
+<Callout>
+  You can also use `![](../public/demo.png)` to load the image from a relative
+  path, if you don't want to host it via `public`.
+</Callout>
+
+With Next.js Image, there will be no layout shift, and a beautiful blurry
+placeholder will be shown by default when loading the images
+
+---
+
+## Headings
 
 Headings are usually created in Markdown with a set of hash (\#) characters placed before the text for the heading, with a space in between (this space is **required** in Gatsby). The number of hashes corresponds to the level of the heading (i.e., \# corresponds to a first-level heading, or the `<h1>` HTML tag).
 
@@ -24,9 +225,9 @@ There is alternative syntax for `<h1>` and `<h2>` headings:
 | `Heading 1` <br /> `===============` | `<h1>Heading 1</h1>` |
 | `Heading 2` <br /> `---------------` | `<h2>Heading 2</h2>` |
 
-### Emphasis
+## Emphasis
 
-#### Italics
+### Italics
 
 To mark text in *italics*, add an asterisk (\*) or underscore (\_) before and after the text to be formatted.
 
@@ -34,7 +235,7 @@ To mark text in *italics*, add an asterisk (\*) or underscore (\_) before and af
 | -------- | ----------- | ---- | ------ |
 | `*italics*` | `_italics_` | `<em>italics</em>` | *italics* |
 
-#### Bold
+### Bold
 
 To mark text in **boldface**, add two asterisks (\*\*) or two underscores (\_\_) before and after the text to be formatted.
 
@@ -42,7 +243,7 @@ To mark text in **boldface**, add two asterisks (\*\*) or two underscores (\_\_)
 | -------- | ----------- | ---- | ------ |
 | `**boldface**` | `__boldface__` | `<strong>boldface</strong>` | **boldface** |
 
-#### Bold and italics together
+### Bold and italics together
 
 To emphasize text with ***both boldface and italics***, use three asterisks (\*\*\*) or three underscores (\_\_\_) before and after the text to be formatted.
 
@@ -59,7 +260,7 @@ To emphasize text with ***both boldface and italics***, use three asterisks (\*\
 
 The underscores only work when there is spacing before and after the emphasized word.
 
-### Line breaks
+## Line breaks
 
 To create a line break, follow a line with two spaces and then hit enter.
 
@@ -67,23 +268,339 @@ To create a line break, follow a line with two spaces and then hit enter.
 This is the first line.   
 This is the second line.
 
-### Built-ins in Nextra
+## `<hr/>`
 
-#### Callout
+just type 3 dashes
+
+```mdx
+---
+```
+
+## Block quotes
+
+type this `>` before the centense
+
+you git this
+
+> This is a Block quote
+
+---
+
+## Lists
+
+### Unordered lists
+
+```
+* Oranges
+* Apples
+
++ Oranges
++ Apples
+
+- Oranges
+- Apples
+```
+
+This renders as
+
+* Oranges
+* Apples
+
+### Ordered lists
+
+```
+1. Oranges
+2. Apples
+```
+
+This renders as
+
+1. Oranges
+2. Apples
+
+### Nested lists
+
+```
+* Apples
+* Oranges
+* Berries
+    * Strawberries
+    * Raspberries
+```
+
+This renders as
+
+* Apples
+* Oranges
+* Berries
+    * Strawberries
+    * Raspberries
+
+---
+
+## Built-ins Components
 
 Nextra includes a couple of built-in components that you can use to better style your content:
 
-import { Callout } from 'nextra/components'
- 
+### Callout
+
+Examples
+
+#### Default
+
 <Callout emoji="👾">
   **Space Invaders** is a 1978 shoot 'em up arcade game developed by Tomohiro
   Nishikado.
 </Callout>
 
+```mdx copy
+import { Callout } from 'nextra/components'
 
+<Callout emoji="👾">
+  **Space Invaders** is a 1978 shoot 'em up arcade game developed by Tomohiro
+  Nishikado.
+</Callout>
+```
 
+#### Info
 
+<Callout type="info" emoji="ℹ️">
+  Today is Friday.
+</Callout>
 
+```mdx copy
+import { Callout } from 'nextra/components'
 
+<Callout type="info" emoji="ℹ️">
+  Today is Friday.
+</Callout>
+```
 
+#### Warning
 
+<Callout type="warning" emoji="⚠️">
+  This API will be deprecated soon.
+</Callout>
+
+```mdx copy
+import { Callout } from 'nextra/components'
+
+<Callout type="warning" emoji="⚠️">
+  This API will be deprecated soon.
+</Callout>
+```
+
+#### Error
+
+<Callout type="error" emoji="🚫">
+  This is a dangerous feature that can cause everything to explode.
+</Callout>
+
+```mdx copy
+import { Callout } from 'nextra/components'
+
+<Callout type="error" emoji="️🚫">
+  This is a dangerous feature that can cause everything to explode.
+</Callout>
+```
+
+### Cards
+
+Examples
+
+import { Card, Cards } from 'nextra/components'
+
+<Cards>
+  <Card
+    
+    title="Callout"
+    href="/reference/mdx#callout"
+  />
+  <Card  title="Tabs" href="/reference/mdx#tabs" />
+  <Card  title="Steps" href="/reference/mdx#steps" />
+</Cards>
+
+Usage
+
+{/* prettier-ignore */}
+```mdx filename="Markdown" copy
+import { Cards, Card } from 'nextra/components'
+
+<Cards>
+  <Card title="Callout" href="/..." />
+  <Card title="Tabs" href="/..." />
+  <Card title="Steps" href="/..." />
+</Cards>
+```
+
+### Tabs 
+
+Example
+
+import { Tabs } from 'nextra/components'
+
+{/* prettier-ignore */}
+<Tabs items={['pnpm', 'npm', 'yarn']}>
+  <Tabs.Tab>**pnpm**: Fast, disk space efficient package manager.</Tabs.Tab>
+  <Tabs.Tab>**npm** is a package manager for the JavaScript programming language.</Tabs.Tab>
+  <Tabs.Tab>**Yarn** is a software packaging system.</Tabs.Tab>
+</Tabs>
+
+Default
+
+{/* prettier-ignore */}
+```mdx copy
+import { Tabs } from 'nextra/components' 
+
+<Tabs items={['pnpm', 'npm', 'yarn']}>
+  <Tabs.Tab>**pnpm**: Fast, disk space efficient package manager.</Tabs.Tab>
+  <Tabs.Tab>**npm** is a package manager for the JavaScript programming language.</Tabs.Tab>
+  <Tabs.Tab>**Yarn** is a software packaging system.</Tabs.Tab>
+</Tabs>
+```
+
+Default Selected Index
+
+You can use the `defaultIndex` prop to set the default tab index:
+
+```mdx /defaultIndex="1"/
+import { Tabs } from 'nextra/components'
+
+<Tabs items={['pnpm', 'npm', 'yarn']} defaultIndex="1">
+  ...
+</Tabs>
+```
+
+And you will have `npm` as the default tab:
+
+{/* prettier-ignore */}
+<Tabs items={['pnpm', 'npm', 'yarn']} defaultIndex="1">
+  <Tabs.Tab>**pnpm**: Fast, disk space efficient package manager.</Tabs.Tab>
+  <Tabs.Tab>**npm** is a package manager for the JavaScript programming language.</Tabs.Tab>
+  <Tabs.Tab>**Yarn** is a software packaging system.</Tabs.Tab>
+</Tabs>
+
+### Steps
+
+import { Steps } from 'nextra/components'
+
+Usage
+
+Wrap a set of markdown h3 headings with the `Steps` component to turn them into
+visual steps.
+
+<Steps>
+
+### Step 1
+
+Content for step 1.
+
+### Step 2
+
+Contents for step 2.
+
+</Steps>
+
+{/* prettier-ignore */}
+```mdx
+import { Steps } from 'nextra/components'
+
+<Steps>
+### Step 1
+
+Contents for step 1.
+
+### Step 2
+
+Contents for step 2.
+</Steps>
+```
+
+### File Tree
+
+import { FileTree } from 'nextra/components'
+
+Example
+
+<FileTree>
+  <FileTree.Folder name="pages" defaultOpen>
+    <FileTree.File name="_meta.json" />
+    <FileTree.File name="contact.md" />
+    <FileTree.File name="index.mdx" />
+    <FileTree.Folder name="about">
+      <FileTree.File name="_meta.json" />
+      <FileTree.File name="legal.md" />
+      <FileTree.File name="index.mdx" />
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+Usage
+
+```mdx filename="Markdown"
+
+<FileTree>
+  <FileTree.Folder name="pages" defaultOpen>
+    <FileTree.File name="_meta.json" />
+    <FileTree.File name="contact.md" />
+    <FileTree.File name="index.mdx" />
+    <FileTree.Folder name="about">
+      <FileTree.File name="_meta.json" />
+      <FileTree.File name="legal.md" />
+      <FileTree.File name="index.mdx" />
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+```
+
+---
+
+## Escaping characters
+
+Certain characters, such as the hash symbol (\#) and the plus sign (\+), can be interpreted by Markdown as part of its syntax. To print one of these characters literally on screen, you can escape it using a backslash (\\). For example, `\\` prints the \\ character itself.
+
+Alternatively, treat the symbol as <a href="#code">inline code or a code block</a> by enclosing it in backticks (\`). Note, however, that this will change its font and/or background color.
+
+The following characters can be escaped using a backslash (\\) to ensure they are rendered literally on screen:
+
+| Symbol | Name |
+| :----: | ---- |
+| \*     | asterisk |
+| \\     | backslash |
+| \`     | backtick |
+| \[\]   | brackets |
+| \{\}   | curly braces |
+| \(\)   | parentheses |
+| \.     | period or dot |
+| \#     | hash or pound sign |
+| \+     | plus sign |
+| \-     | minus sign or hyphen |
+| \_     | underscore |
+| \!     | exclamation mark |
+| \|     | pipe | 
+
+To escape a fenced code block, increase the number of backticks in the outer code block:
+
+`````
+````
+
+outer code block
+
+```
+inner code block
+```
+
+````
+`````
+
+This renders as 
+
+````
+
+outer code block
+
+```
+inner code block
+```
+
+````

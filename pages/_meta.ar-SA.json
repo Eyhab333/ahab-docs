@@ -3,13 +3,13 @@
       "title" : "الرئيسية"
     },
     "contact": {
-      "title" : "تواصل معنا",
+      "title" : "تواصل معي",
       "type" : "page",
       "href": "https://www.linkedin.com/in/ahab-fadl/",
       "newWindow": true
     },
     "about": {
-      "title" : "من نحن",
+      "title" : "من انا",
       "type" : "page",
       "theme" : {
         "typesetting": "article"
