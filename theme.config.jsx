@@ -32,4 +32,23 @@ export default {
     { locale: 'en-US', text: 'English' },
     { locale: 'ar-SA', text: 'العربية', direction: 'rtl' }
   ]
+  ,
+  footer: {
+    text: (
+      <span>
+        MIT {new Date().getFullYear()} ©{' '}
+        <a href="https://nextra.site" target="_blank">
+          Nextra
+        </a>
+        .
+        <span>   </span>
+        <span>
+          Credits to <a href="https://programmingadvices.com" target="_blank" rel="noopener noreferrer">
+          Dr. Mohammed Abu-Hadhoud
+          </a>
+        </span>
+      </span>
+      
+    )
   }
+}

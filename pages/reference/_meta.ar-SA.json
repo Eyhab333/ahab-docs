@@ -1,10 +1,10 @@
 {
     "mdx" : "MDX",
     "cplusplus-util-classes" : "سي بلس بلس كلاسات مساعدة",
-    "problem-solving" : "حل المشكلات",
+    "oop" : "البرمجة كائنية التوجه",
+    "problem-solving-cplusplus" : "حل المشكلات",
     "algorithms" : "الخوارزميات",
     "data-structures" : "هيكلة البيانات",
-    "oop" : "البرمجة كائنية التوجه",
     "sql" : "قواعد البيانات",
     "restful-api" : "RESTFUL API",
     "react" : "إطار عمل رياكت"

@@ -1,0 +1,87 @@
+# Dealing with Files in C++
+
+```c++ copy
+#pragma warning(disable : 4996)
+#pragma once
+
+#include <ctime>
+#include <iostream>
+#include <vector>
+#include <cctype>
+#include <fstream>
+#include <string>
+using namespace std;
+
+namespace Course6Func
+{
+	// طباعة محتويات ملف
+	void PrintFileContent(string FileName)
+	{
+		fstream MyFile;
+		MyFile.open(FileName, ios::in);//read Mode اقرأ فقط 
+		if (MyFile.is_open())
+		{
+			string Line;
+			while (getline(MyFile, Line)) //  اقرأ اول سطر وحطه في هذا الفاريبل
+			{
+				cout << Line << endl;
+			}
+			MyFile.close();
+		}
+	}
+	// احفظ الفيكتور الى ملف
+	void SaveVectorToFile(string FileName, vector <string> vFileContent)
+	{
+		fstream MyFile;
+
+		MyFile.open(FileName, ios::out);
+
+		if (MyFile.is_open())
+		{
+			for (string& Line : vFileContent)
+			{
+				if (Line != "")
+				{
+					MyFile << Line << endl;
+				}
+			}
+			MyFile.close();
+		}
+	}
+	// حمل البيانات من ملف الى فيكتور
+	void LoadDataFromFileToVector(string FileName, vector <string>& vFileContent)
+	{
+		fstream MyFile;
+		MyFile.open(FileName, ios::in);//read Mode
+		if (MyFile.is_open())
+		{
+			string Line;
+			while (getline(MyFile, Line))
+			{
+				vFileContent.push_back(Line);
+			}
+			MyFile.close();
+		}
+	}
+	// احذف ريكورد من ملف
+	void DeleteRecordFromFile(string FileName, string Record)
+	{
+		vector <string> vFileContent;
+		LoadDataFromFileToVector(FileName, vFileContent);
+
+		for (string& Line : vFileContent)
+		{
+			if (Line == Record)
+			{
+				Line = "";
+			}
+		}
+		SaveVectorToFile(FileName, vFileContent);
+	}
+
+
+
+
+	
+}
+```
