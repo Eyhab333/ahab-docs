@@ -1,10 +1,10 @@
 {
     "mdx" : "MDX",
+    "problem-solving-cplusplus" : "Problem Solving",
     "cplusplus-util-classes" : "C++ Utility Classes",
     "oop" : "OOP",
-    "problem-solving-cplusplus" : "Problem Solving",
     "data-structures-and-algorithms" : "Data Structures and Algorithms",
     "sql" : "SQL",
     "restful-api" : "RESTFUL API",
-    "react" : "React"
+    "boilerplate" : "Boilerplate"
 }
