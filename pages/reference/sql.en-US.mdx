@@ -1,1 +1,1768 @@
 # SQL
+
+import { Callout } from 'nextra/components'
+
+<Callout>
+  Database management systems that use SQL are: Oracle, Sybase, Microsoft SQL
+  Server, Access, Ingres, etc.
+</Callout>
+
+| **acronyms** | **Description** |
+| :----: | ---- |
+| SQL   | Structured Query Language|
+| DDL   | Data Definition Language |
+| DML   | Data Manipulation Language|
+| DCL   | Data Control Language|
+| DQL   | Data Query Language|
+| TCL   | Transaction Control Language|
+
+```sql copy
+
+
+
+--عشان تقدر تشوف الدياجرام
+alter authorization on DATABASE::DVLD to [sa];
+ALTER AUTHORIZATION ON DATABASE:: DBName TO [NewLogin] 
+
+
+
+--==========1 - SQL - Data Definition Language - DDL=======
+
+--=====88888888===========88===================88888=======
+--=====88888888===========88===================88888====
+--=====88888888===========88=========
+--1- Create Database
+CREATE DATABASE Koko;
+--=====88888888===========88===================88888=========
+--=====88888888===========88===================88888====
+--=====88888888===========88=========
+
+--2- Create Database IF NOT EXISTS
+IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'koko')
+  BEGIN
+    CREATE DATABASE koko;
+  END
+
+--3 - Switch Database
+--USE koko;
+
+--4 - Drop Database
+--DROP DATABASE koko;
+
+--5 - Drop DATABASE IF EXISTS
+IF EXISTS(SELECT * FROM sys.databases WHERE name = 'koko')
+  BEGIN
+    Drop DATABASE koko;
+  END
+
+
+
+--=====88888888===========88===========
+--=====88888888===========88========
+--=====88888888===========88=====
+CREATE TABLE EmployeesQuieck (
+    id int IDENTITY(1,1) PRIMARY KEY
+);
+--=====88888888===========88=====
+--=====88888888===========88========
+--======888888==============88888======
+
+
+
+--6 -============= Create Table============================
+--CREATE TABLE table_name (
+--    column1 datatype,
+--    column2 datatype,
+--    column3 datatype,
+--   ....
+--);
+CREATE TABLE Employeess (
+    ID int NOT NULL,
+    Name nvarchar(50) NOT NULL,
+	Phone nvarchar(10) NULL,
+	Salary smallmoney NULL,
+    PRIMARY KEY (ID)
+);
+--=====88888888===========88===================88888=====
+CREATE TABLE EmployeesQuieckk (
+    id int IDENTITY(1,1) PRIMARY KEY
+);
+--======888888==============88888================888888====
+--7 -  Drop Table
+--DROP TABLE Employees;
+
+
+--=========2 - DDL - Alter Table Statement===========
+--1- Add Column
+ALTER TABLE Employees
+ADD Gendor char(1);
+--2 - Rename Column
+exec sp_rename 'table_name.old_column_name', 'new_column_name', 'COLUMN';
+--3 - Rename a table
+exec sp_rename 'old_table_name', 'new_table_name';
+--4 - Modify a column
+ALTER TABLE Employees
+ALTER COLUMN Name VARCHAR(100);
+--5 - Delete a column
+ALTER TABLE Employees
+DROP COLUMN Gender;
+
+--========3 - Backup & Restore Database================
+--1 - Backup Database
+BACKUP DATABASE MyDatabase1
+TO DISK = 'C:\MyDatabase1_backup.bak';
+--2 - Differential Backup
+BACKUP DATABASE MyDatabase1
+TO DISK = 'C:\MyDatabase1_backup.bak'
+WITH DIFFERENTIAL;
+--3-  Restore Database
+RESTORE DATABASE MyDatabase1
+FROM DISK = 'C:\MyDatabase1.bak';
+
+--======4- Data Manipulation Language - DML============
+--1 - Insert Into Statement
+--this will show all data in the table
+select * from Employees;
+
+
+--Insert one record at a time
+Insert Into Employees 
+values
+(10,'Emp10','079939',1000);
+
+--Insert one record at a time with some null values
+Insert Into Employees 
+values
+(11,'Emp11',null,null);
+
+
+--insert multiple records at a time.
+Insert Into Employees 
+values
+(2,'Emp2','552221',700),
+(3,'Emp3','55554',300),
+(4,'Emp4','322344',400);
+
+
+--insert only selected fields
+Insert Into Employees (ID, Name)
+values
+(5,'Emp5');
+
+
+--if you forget to insert not null filed an error will occure.
+Insert Into Employees (ID)
+values (5);
+
+
+select * from Employees;
+
+--this will delete all records in table.
+--delete from Employees;
+--2 - Update Statement
+--this will show all data in the table
+select * from Employees;
+
+-- this will update one filed at a time
+Update Employees 
+set Name ='Mohammed Abu-Hadhoud' 
+where ID=2;
+
+-- this will update multiple fields at a time.
+Update Employees 
+set Name ='Mohammed Abu-Hadhoud' ,  Salary=5000
+where ID=2;
+
+-- this will increase the salary by 200 for
+--all employees that their salaries are less than 500
+update Employees 
+set Salary = Salary+ 200
+where  Salary < 500 ;
+
+-- this will increase the salary by 10% for all employees that their salaries are less than or equal 1000
+update Employees 
+set Salary = Salary *1.1 
+where  Salary <= 1000;
+
+--3 - Delete Statement
+--this will show all data in the table
+select * from Employees;
+
+-- this will delete all employees which their salary is null
+delete from Employees 
+where salary is null;
+
+-- this will delete all employees that have their id=4 , which is one record in our case
+delete from Employees 
+where ID=4;
+
+--4 - Select Into Statement
+
+--this will show all data in the table
+select * from Employees;
+
+-- this will create a new table named EmployeesCopy1
+--based on the selected columns then it will 
+--copy the data from Employees table based on 
+--the condition provided
+
+SELECT *
+INTO EmpoyeesCopy1
+FROM Employees;
+
+select * from EmpoyeesCopy1;
+
+
+
+
+-- this will create a new table named EmployeesCopy1 based on the selected coumns then it will copy the data from Employees table based on the condition provided
+SELECT ID, Name
+INTO EmpoyeesCopy2
+FROM Employees;
+
+select * from EmpoyeesCopy2;
+
+
+
+-- this will create a new table named EmployeesCopy1 based on the selected coumns then it will 
+--  copy the data from Employees table based on the condition provided which is false means no data will be copied
+SELECT *
+INTO EmpoyeesCopy3
+FROM Employees 
+where 5=6;
+
+select * from EmpoyeesCopy3;
+
+
+--5 - Insert Into ..Select From Statement
+--Copy all columns from one table to another table:
+--INSERT INTO table2
+--SELECT * FROM table1
+--WHERE condition;
+
+--Copy only some columns from one table into another table:
+--INSERT INTO table2 (column1, column2, column3, ...)
+--SELECT column1, column2, column3, ...
+--FROM table1
+--WHERE condition;
+
+
+
+--========5 - Misc 1===========
+--1 - Identity Field (Auto Increment)
+CREATE TABLE Persons (
+   Personid int IDENTITY(1,1) PRIMARY KEY,
+   LastName varchar(255) NOT NULL,
+   FirstName varchar(255),
+   Age int
+);
+
+CREATE TABLE Departments (
+    ID int identity(1,1)  NOT NULL,
+    Name nvarchar(50) NOT NULL,
+    PRIMARY KEY (ID)
+);
+
+insert into Departments 
+values ('HR');
+
+print @@identity;--هنا بيحفظ اخر قيمة وصل عندها عموما هو تبع t-sql
+
+
+--2 -   Delete vs Truncate statement.
+
+select * from Departments;
+
+--this will delete all rows but will not reset the identity counter.
+delete from Departments;
+--delete support where clause, truncate doesn't
+
+--this will delete all rows and reset the identity counter.
+truncate table departments;
+
+insert into Departments 
+values ('HR');
+
+print @@identity;
+
+--3 - Foreign Key Constraint
+
+-- This table doesn't have a foreign key
+CREATE TABLE Customers (
+  id INT ,
+  first_name VARCHAR(40),
+  last_name VARCHAR(40),
+  age INT,
+  country VARCHAR(10),
+  PRIMARY KEY (id)
+);
+
+
+-- Adding foreign key to the customer_id field
+-- The foreign key references to the id field of the Customers table
+CREATE TABLE Orders (
+  order_id INT,
+  item VARCHAR(40),
+  amount INT,
+  customer_id INT REFERENCES Customers(id),
+  PRIMARY KEY (order_id)
+);
+
+
+
+--====Foreign Key with => Alter Table===
+-- This table doesn't have a foreign key
+CREATE TABLE Customers (
+  id INT ,
+  first_name VARCHAR(40),
+  last_name VARCHAR(40),
+  age INT,
+  country VARCHAR(10),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE Orders (
+  order_id INT,
+  item VARCHAR(40),
+  amount INT,
+  customer_id INT ,
+  PRIMARY KEY (order_id)
+);
+-- Adding foreign key to the customer_id field using alter
+ALTER TABLE Orders
+ADD FOREIGN KEY (customer_id) REFERENCES Customers(id);
+
+
+--4 - Solution To Saving changes is not permitted errorتمام
+
+
+--=============6 - SQL - Queries=================
+--1 - Restore Sample HR Database and Get Ready .
+
+--2 - Select Statement
+
+--3 -  Select Distinct Statement
+
+--4 - Where Statement + AND , OR, NOT
+
+--5 - In Operator
+
+--6 -  Sorting  Order By
+
+--7 - Select Top Statement
+
+--8 - Select As
+
+--9 - Between Operator
+
+--10 - Count, Sum, Avg, Min, Max Functions
+
+--11 - Group By
+
+--12 - Having
+
+--13 - Like
+
+--14 - WildCards
+
+--Restore Database DVLD from disk ='c:\DVLD.bak';
+
+--solution diagram
+--use HR_Database;
+--EXEC sp_changedbowner 'sa';
+
+
+
+-- Select Statement (6:37)
+Select * from Employees;
+
+Select Employees.* from Employees;
+
+Select ID, FirstName, LastName,MonthlySalary
+From Employees;
+
+Select ID, FirstName, DateOfBirth From Employees;
+
+Select * from Departments;
+
+Select * from Countries;
+
+
+--The SQL SELECT DISTINCT Statement
+Select DepartmentID from Employees;
+
+Select Distinct  DepartmentID from Employees;
+
+
+Select FirstName from Employees;
+
+Select Distinct  FirstName from Employees;
+
+
+Select FirstName, DepartmentID from Employees;
+
+Select distinct FirstName, DepartmentID from Employees;
+
+
+--The SQL WHERE Clause
+Select * from Employees
+where Gendor='F';
+
+Select * from Employees
+where  MonthlySalary<=500;
+
+
+Select * from Employees
+where  MonthlySalary>500;
+
+Select * from Employees
+where Not MonthlySalary<=500;
+
+
+Select * from Employees
+where MonthlySalary<500 and Gendor='F';
+
+select * from Employees
+where CountryID=1;
+
+
+select * from Employees
+where Not CountryID=1;
+
+
+select * from Employees
+where  CountryID <> 1;
+--               <>معناها لا تساوي 
+
+select * from Employees
+where DepartmentID=1;
+
+select * from Employees
+where DepartmentID=1 and Gendor='M';
+
+
+select * from Employees
+where DepartmentID=1 Or DepartmentID=2;
+
+select * from Employees
+where DepartmentID=1 AND DepartmentID=2;
+
+
+Select * from Employees
+where ExitDate is Null;
+
+
+Select * from Employees
+where ExitDate  is Not Null;
+
+
+
+--The SQL IN Operator
+select * from Employees
+where DepartmentID=1 Or DepartmentID=2;
+
+
+select * from Employees
+where DepartmentID=1 Or DepartmentID=2 or DepartmentID=7;
+
+
+select * from Employees
+where DepartmentID=1 Or DepartmentID=2 or DepartmentID=5 or DepartmentID=7;
+
+
+select * from Employees
+where DepartmentID in (1,2,5,7);
+
+
+select * from Employees
+where FirstName in ('Jacob','Brooks','Harper');
+
+
+select Departments.Name from Departments 
+where 
+ID in ( select DepartmentID from Employees where MonthlySalary <=210 );
+
+
+select Departments.Name from Departments 
+where 
+ID not in 
+(
+select DepartmentID from Employees
+where 
+MonthlySalary <=210 
+);
+
+
+--Sorting : Order By
+--The SQL ORDER BY Keyword
+
+select ID, FirstName,MonthlySalary from Employees
+where DepartmentID=1
+
+
+select ID, FirstName,MonthlySalary from Employees
+where DepartmentID=1
+Order By FirstName ;
+
+select ID, FirstName,MonthlySalary from Employees
+where DepartmentID=1
+Order By FirstName ASC;  --ASC يعني ترتيب تصاعدي 
+
+select ID, FirstName,MonthlySalary from Employees
+where DepartmentID=1
+Order By FirstName desc;  --desc ترتيب تنازلي
+
+select ID, FirstName,MonthlySalary from Employees
+where DepartmentID=1
+Order By MonthlySalary ;
+
+
+select ID, FirstName,MonthlySalary from Employees
+where DepartmentID=1
+Order By MonthlySalary Asc;
+
+
+select ID, FirstName,MonthlySalary from Employees
+where DepartmentID=1
+Order By MonthlySalary Desc;
+
+
+
+select ID, FirstName,MonthlySalary from Employees
+where DepartmentID=1
+Order By FirstName , MonthlySalary ;
+
+
+select ID, FirstName,MonthlySalary from Employees
+where DepartmentID=1
+Order By FirstName ASC, MonthlySalary Desc;
+
+
+
+
+--The SQL SELECT TOP Clause
+Select * from Employees;
+
+
+-- This will show top 5 employees.
+Select top 5 * from Employees;
+
+
+-- This will show top 10% of the data.
+select top 10 percent * from Employees;
+
+-- this will show the all salaries 
+--ordered from the heighest to lowest.
+select  MonthlySalary from employees
+order by MonthlySalary Desc;
+
+
+
+-- this will show the all salaries 
+--ordered from the heighest to lowest without redundancy.
+select distinct MonthlySalary from employees
+order by MonthlySalary Desc;
+
+-- this will show the heighest 3 salaries.
+select  distinct  top 3 MonthlySalary from employees
+order by MonthlySalary Desc;
+
+
+--This will show all employees who takes
+--one of the heighest 3 salaries.
+
+select ID , FirstName, MonthlySalary
+from Employees where MonthlySalary 
+In
+(
+	select  distinct  top 3 MonthlySalary from employees
+	order by MonthlySalary Desc
+)
+
+Order By MonthlySalary Desc
+
+
+
+--This will show all employees who 
+--takes one of the Lowest 3 salaries.
+select ID , FirstName, MonthlySalary from Employees where MonthlySalary In
+(
+	select  distinct  top 3 MonthlySalary from employees
+	order by MonthlySalary ASC
+)
+
+Order By MonthlySalary ASC
+
+
+
+
+
+
+-- Select As
+--SQL Aliases
+Select A= 5 * 4 , B= 6/2 
+
+
+
+Select A= 5 * 4 , B= 6/2 
+from employees
+
+
+
+Select ID, FirstName,  A = MonthlySalary/2
+from employees
+
+
+Select 
+ID, FirstName + ' ' + LastName 
+as 
+FullName 
+From Employees;
+
+
+Select ID, FullName = FirstName + ' ' + LastName 
+From Employees;
+
+
+select ID, FirstName , MonthlySalary ,
+YealySalary = MonthlySalary * 12
+from employees;
+
+
+select ID, FirstName , MonthlySalary , 
+YealySalary =MonthlySalary* 12 , 
+BonusAmount= MonthlySalary * BonusPerc  
+from employees;
+
+
+select Today = getDate()
+
+
+select ID,
+FullName= FirstName + ' ' + LastName,
+Age =
+DATEDIFF(Year , DateOfBirth , getDate()) 
+from Employees;
+
+
+
+--The SQL BETWEEN Operator
+Select * from Employees where
+(MonthlySalary >=500 and MonthlySalary <=1000)
+
+
+Select * from Employees where
+MonthlySalary Between 500 and 600;
+
+
+
+--Count, Sum, Avg, Min, Max Functions
+select TotalCount=Count(MonthlySalary), 
+	   TotalSum=Sum(MonthlySalary),
+	   Average=Avg(MonthlySalary),
+	   MinSalary=Min(MonthlySalary),
+	   MaxSalary=Max(MonthlySalary) 
+	   
+	   from Employees;
+
+
+
+select  TotalCount=Count(MonthlySalary), 
+	   TotalSum=Sum(MonthlySalary),
+	   Average=Avg(MonthlySalary),
+	   MinSalary=Min(MonthlySalary),
+	   MaxSalary=Max(MonthlySalary) 
+	   
+	   from Employees where DepartmentID=1
+	   
+	   
+select * from employees;
+
+select TotalEmployees = count (ID) from Employees;
+
+--count function only counts the not null values.
+select 
+ResignedEmployees= count(ExitDate)  
+from employees;
+
+--GROUP BY Syntax
+--SELECT column_name(s)
+--FROM table_name
+--WHERE condition
+--GROUP BY column_name(s)
+--ORDER BY column_name(s);
+
+
+--Having is the where satement for group by
+--تستخدمها لو عاوز تعمل فلترينج للنتائج 
+--اللي جاية من جروب باي
+--where بنستخدمها مع النتايج العادية
+select 
+	DepartmentID, 
+	TotalCount=Count(MonthlySalary), 
+	TotalSum=Sum(MonthlySalary),
+	Average=Avg(MonthlySalary),
+	MinSalary=Min(MonthlySalary),
+	MaxSalary=Max(MonthlySalary) 
+from Employees
+Group By DepartmentID
+having Count(MonthlySalary) > 100
+
+
+
+-- Same solution without having :-)
+select * from 
+(
+
+   select DepartmentID,
+   TotalCount=Count(MonthlySalary), 
+	   TotalSum=Sum(MonthlySalary),
+	   Average=Avg(MonthlySalary),
+	   MinSalary=Min(MonthlySalary),
+	   MaxSalary=Max(MonthlySalary) 
+	   
+	   from Employees
+	
+       Group By DepartmentID
+	  
+) R1 --هسميها R1
+
+where R1.TotalCount> 100;
+
+
+
+
+--SELECT column_name(s)
+--FROM table_name
+--WHERE condition
+--GROUP BY column_name(s)
+--HAVING condition
+--ORDER BY column_name(s);
+
+
+
+
+--LIKE Syntax
+--SELECT column1, column2, ...
+--FROM table_name
+--WHERE columnN LIKE pattern;
+
+select * from Employees;
+
+--Finds any values that start with "a"
+select ID, FirstName from Employees
+where FirstName like 'a%';--يبدأ بحرف ال a
+
+
+--Finds any values that end with "a"
+select ID, FirstName from Employees
+where FirstName like '%a';
+
+
+--Finds any values that have "tell" in any position
+select ID, FirstName from Employees
+where FirstName like '%tell%';
+
+--	Finds any values that start with "a" and ends with "a"
+select ID, FirstName from Employees
+where FirstName like 'a%a';
+
+--Finds any values that have "a" in the second position
+select ID, FirstName from Employees
+where FirstName like '_a%';
+
+--Finds any values that have "a" in the third position
+select ID, FirstName from Employees
+where FirstName like '__a%';
+
+
+--Finds any values that start with "a" 
+--and are at least 3 characters in length
+select ID, FirstName from Employees
+where FirstName like 'a__%';
+
+--Finds any values that start with "a" 
+--and are at least 4 characters in length
+select ID, FirstName from Employees
+where FirstName like 'a___%';
+
+
+
+--Finds any values that start with "a"
+select ID, FirstName from Employees
+where 
+FirstName 
+like 'a%' or
+FirstName like 'b%' ;
+
+
+
+
+
+--wild card
+
+--Execute these satatements to update data
+Update Employees 
+set 
+FirstName ='Mohammed',
+LastName='Abu-Hadhoud'
+where 
+ID= 285;
+
+
+Update Employees 
+set FirstName ='Mohammad' , LastName='Maher'
+where ID= 286;
+
+--------------------------------
+
+select 
+ID, FirstName, LastName from Employees
+Where 
+FirstName = 'Mohammed'
+or
+FirstName ='Mohammad'; 
+
+
+-- will search form Mohammed or Mohammad
+select ID, FirstName, LastName from Employees
+Where firstName like 'Mohamm[ae]d';
+
+-------------------------------------
+
+--You can use Not 
+select ID, FirstName, LastName from Employees
+Where firstName Not like 'Mohamm[ae]d';
+
+--------------------
+
+select ID, FirstName, LastName from Employees
+Where firstName like 'a%' or firstName like 'b%' or firstName like 'c%';
+
+
+-- search for all employees that 
+--their first name start with a or b or c
+select ID, FirstName, LastName from Employees
+Where firstName like '[abc]%';
+
+
+---------------------------------
+-- search for all employees that 
+--their first name start with any letter from a to l
+select ID, FirstName, LastName from Employees
+Where firstName like '[a-l]%';
+
+
+--------------------========================================================================================
+
+
+--كل اللي فوق ده كنا بنستخدم السيليكت عشان
+--كنا شغالين على جدول واحد
+--لو هتشتغل على اكتر من تابل لازم تستخدم الجوين
+
+-- Join and Inner Join are the same
+
+select * from Customers;
+
+select * from Orders;
+
+
+SELECT 
+Customers.CustomerID,
+Customers.Name,
+Orders.Amount
+FROM 
+Customers 
+JOIN 
+Orders 
+ON 
+Customers.CustomerID = Orders.CustomerID;
+
+
+
+SELECT 
+Customers.CustomerID,
+Customers.Name,
+Orders.Amount
+FROM Customers 
+Inner JOIN Orders 
+ON Customers.CustomerID = Orders.CustomerID;
+
+
+SELECT
+Customers.CustomerID,
+Customers.Name,
+Orders.Amount
+FROM  
+Customers 
+INNER JOIN
+Orders 
+ON 
+Customers.CustomerID = Orders.CustomerID
+
+
+--Inner Join
+SELECT 
+Customers.CustomerID,
+Customers.Name,
+Orders.Amount
+FROM  
+Customers
+INNER JOIN
+Orders 
+ON 
+Customers.CustomerID = Orders.CustomerID
+
+--Left Join
+SELECT
+Customers.CustomerID,
+Customers.Name,
+Orders.Amount
+FROM
+Customers 
+LEFT OUTER JOIN 
+Orders 
+ON
+Customers.CustomerID = Orders.CustomerID
+
+--Right Join
+SELECT        Customers.CustomerID, Customers.Name, Orders.Amount
+FROM            Customers RIGHT OUTER JOIN
+                         Orders ON Customers.CustomerID = Orders.CustomerID
+--Full Join
+SELECT        Customers.CustomerID, Customers.Name, Orders.Amount
+FROM            Customers FULL OUTER JOIN
+                         Orders ON Customers.CustomerID = Orders.CustomerID
+
+--------------------========================================================================================
+
+
+--SQL CREATE VIEW Statement
+--In SQL, a view is a virtual table based on the
+--result-set of an SQL statement.
+
+--A view contains rows and columns, just like a real table.
+--The fields in a view are fields from one or more real tables in
+--the database.
+
+--You can add SQL statements and functions to
+--a view and present the data as if the data were coming from
+--one single table.
+
+--A view is created with the CREATE VIEW statement. 
+
+--CREATE VIEW Syntax
+--CREATE VIEW view_name AS
+--SELECT column1, column2, ...
+--FROM table_name
+--WHERE condition;
+
+--Note: A view always shows
+--up-to-date data!
+--The database engine recreates the view,
+--every time a user queries it.
+
+
+--------------------========================================================================================
+
+
+--The SQL EXISTS Operator
+--The EXISTS operator is used to test for
+--the existence of any record in a subquery.
+
+--The EXISTS operator returns TRUE if
+--the subquery returns one or more records.
+
+--EXISTS Syntax
+--SELECT column_name(s)
+--FROM table_name
+--WHERE EXISTS
+--(SELECT column_name FROM table_name WHERE condition);
+
+--The SQL EXISTS operator executes the outer SQL query if the subquery is not NULL (empty result-set).
+
+
+
+
+
+select X='yes'
+where  exists 
+( 
+	select * from Orders
+	where customerID= 3 and Amount < 600
+)
+
+--==
+select * from Customers T1
+where 
+exists 
+( 
+	select * from Orders
+	where customerID= T1.CustomerID and Amount < 600
+)
+
+--More optimized and faster
+select * from Customers T1
+where 
+exists 
+( 
+	select top 1 * from Orders
+	where customerID= T1.CustomerID and Amount < 600
+)
+
+
+--More optimized and faster
+select * from Customers T1
+where 
+  exists 
+   ( 
+	select top 1 R='Y'  from Orders
+	where customerID= T1.CustomerID and Amount < 600
+	)
+
+--------------------========================================================================================
+
+
+--The SQL UNION Operator
+
+--The UNION operator is used to combine the
+--result-set of two or more SELECT statements.
+
+--Every SELECT statement within UNION must have the same number of columns
+--The columns must also have similar data types
+--The columns in every SELECT statement must also be in the same order
+
+
+--UNION Syntax
+--SELECT column_name(s) FROM table1
+--UNION
+--SELECT column_name(s) FROM table2;
+
+--UNION ALL Syntax
+--The UNION operator selects only distinct values by default. To allow duplicate values, use UNION ALL:
+
+--SELECT column_name(s) FROM table1
+--UNION ALL
+--SELECT column_name(s) FROM table2;
+
+--Note: The column names in the result-set
+--are usually equal to the column names in the first SELECT statement.
+
+--SQL
+
+select * from ActiveEmployees
+
+select * from ResignedEmployees
+
+
+select * from ActiveEmployees
+Union
+select * from ResignedEmployees
+
+--this will remove the redundancy from the 
+--resultset (distinct results only)
+select * from Departments
+union 
+select * from Departments;
+
+--this will append data regardeless of any redundancy
+select * from Departments
+union ALL
+select * from Departments;
+
+
+--------------------========================================================================================
+
+--The SQL CASE Expression
+
+--The CASE expression goes through conditions and returns
+--a value when the first condition is met (like an if-then-else statement).
+--So, once a condition is true, it will stop reading and return the result. 
+--If no conditions are true, it returns the value in the ELSE clause.
+
+--If there is no ELSE part and no conditions are true, it returns NULL.
+
+--CASE Syntax
+--CASE
+--    WHEN condition1 THEN result1
+--    WHEN condition2 THEN result2
+--    WHEN conditionN THEN resultN
+--    ELSE result
+--END;
+
+--SQL
+
+
+select ID, FirstName, LastName, GendorTitle =
+CASE
+    WHEN Gendor='M' THEN 'Male'
+    WHEN Gendor='F' THEN 'Female'
+    ELSE 'Unknown'
+END
+
+from Employees
+
+-------
+
+select ID, FirstName, LastName,  GendorTitle =
+CASE
+    WHEN Gendor='M' THEN 'Male'
+    WHEN Gendor='F' THEN 'Female'
+    ELSE 'Unknown'
+END,
+
+Status =
+CASE
+    WHEN ExitDate is null THEN 'Active'
+    WHEN ExitDate is Not null THEN 'Resigned'
+END
+from Employees
+
+----------
+
+select ID, FirstName, LastName,MonthlySalary,
+
+NewSalaryToBe =
+CASE
+    WHEN Gendor='M' THEN MonthlySalary * 1.1
+    WHEN Gendor='F' THEN MonthlySalary * 1.15
+   
+END
+from Employees
+
+--------------------========================================================================================
+
+--SQL Create Constraints
+--Constraints can be specified when the table 
+--is created with the CREATE TABLE statement,
+--or after the table is created with the ALTER TABLE statement.
+
+--Syntax
+--CREATE TABLE table_name (
+--   column1 datatype constraint,
+--   column2 datatype constraint,
+--   column3 datatype constraint,
+--   ....
+--);
+
+
+
+--SQL Constraints
+
+--SQL constraints are used to specify rules for the data in a table.
+
+--Constraints are used to limit the type of data that can go into a table.
+--This ensures the accuracy and reliability of the data in the table.
+--If there is any violation between the constraint and the data action, 
+--the action is aborted.
+
+
+--Constraints can be column level or table level.
+--Column level constraints apply to a column, 
+--and table level constraints apply to the whole table.
+
+
+
+--The following constraints are commonly used in SQL:
+
+--NOT NULL - Ensures that a column cannot have a NULL value
+--UNIQUE - Ensures that all values in a column are different
+--PRIMARY KEY - A combination of a NOT NULL and UNIQUE. Uniquely identifies each row in a table
+--FOREIGN KEY - Prevents actions that would destroy links between tables
+--CHECK - Ensures that the values in a column satisfies a specific condition
+--DEFAULT - Sets a default value for a column if no value is specified
+--CREATE INDEX - Used to create and retrieve data from the database very quickly
+
+
+--------------------========================================================================================
+
+
+--Interview Question?
+--What is the difference between Primary Key Constraint and Unique Constraint?
+
+--Primary Key is Unique but it does not allow NULL  while Unique allows NULL.
+
+
+--------------------========================================================================================
+
+--SQL PRIMARY KEY Constraint
+--The PRIMARY KEY constraint uniquely identifies each record in a table.
+
+--Primary keys must contain UNIQUE values, and cannot contain NULL values.
+
+--A table can have only ONE primary key; and in the table, this primary key can consist of single or multiple columns (fields).
+
+--SQL PRIMARY KEY on CREATE TABLE
+--The following SQL creates a PRIMARY KEY on the "ID" column when the "Persons" table is created:
+
+--CREATE TABLE Persons (
+--   ID int NOT NULL PRIMARY KEY,
+--   LastName varchar(255) NOT NULL,
+--   FirstName varchar(255),
+--   Age int
+--);
+create table persons (
+	id int not null primary key,
+	lastname nvarchar(90) not null,
+
+);
+--To allow naming of a PRIMARY KEY constraint, and for defining a PRIMARY KEY constraint on multiple columns, use the following SQL syntax:
+
+--CREATE TABLE Persons (
+--   ID int NOT NULL,
+--   LastName varchar(255) NOT NULL,
+--   FirstName varchar(255),
+--   Age int,
+--   CONSTRAINT PK_Person PRIMARY KEY (ID,LastName)
+--);
+create table persons (
+	id int not null,
+	lastname nvarchar(90) not null,
+	constraint PK_Person primary key (id,lastname)
+);
+--Note: In the example above there is only ONE
+--PRIMARY KEY (PK_Person). 
+--However, the VALUE of the primary key is
+--made up of TWO COLUMNS (ID + LastName).
+
+
+
+--SQL PRIMARY KEY on ALTER TABLE
+--To create a PRIMARY KEY constraint on the
+--"ID" column when the table is already created, use the following SQL:
+
+--ALTER TABLE Persons
+--ADD PRIMARY KEY (ID);
+alter table persons
+add primary key (id);
+--To allow naming of a PRIMARY KEY constraint,
+--and for defining a PRIMARY KEY constraint on multiple columns, 
+--use the following SQL syntax:
+
+--ALTER TABLE Persons
+--ADD CONSTRAINT PK_Person PRIMARY KEY (ID,LastName);
+alter table persons
+add constraint pk_person primary key (id,lastname);
+--Note: If you use ALTER TABLE to add a primary key,
+--the primary key column(s) must have been declared to not
+--contain NULL values (when the table was first created).
+
+--DROP a PRIMARY KEY Constraint
+--To drop a PRIMARY KEY constraint, use the following SQL:
+
+--ALTER TABLE Persons
+--DROP CONSTRAINT PK_Person;
+alter table persons
+drop constraint pk_person
+
+--------------------========================================================================================
+
+
+--SQL FOREIGN KEY Constraint
+--The FOREIGN KEY constraint is used to prevent actions
+--that would destroy links between tables.
+
+--A FOREIGN KEY is a field (or collection of fields) in one table,
+--that refers to the PRIMARY KEY in another table.
+
+--SQL FOREIGN KEY on CREATE TABLE
+--The following SQL creates a FOREIGN KEY on the "PersonID"
+--column when the "Orders" table is created:
+
+--CREATE TABLE Orders (
+--   OrderID int NOT NULL PRIMARY KEY,
+--   OrderNumber int NOT NULL,
+--   PersonID int FOREIGN KEY REFERENCES Persons(PersonID)
+--);
+create table orders (
+	orderID int not null primary key,
+	orderNumber int not null,
+	personID int foreign key references persons(personID)
+);
+--To allow naming of a FOREIGN KEY constraint,
+--and for defining a FOREIGN KEY constraint on multiple columns,
+--use the following SQL syntax:
+
+--CREATE TABLE Orders (
+--   OrderID int NOT NULL,
+--   OrderNumber int NOT NULL,
+--   PersonID int,
+--   PRIMARY KEY (OrderID),
+--   CONSTRAINT FK_PersonOrder FOREIGN KEY (PersonID)
+--   REFERENCES Persons(PersonID)
+--);
+create table orders (
+	orderID int not null,
+	ordernumber int not null,
+	personid int,
+	primary key (orderID),
+	constraint fk_personOrder foreign key (personID)
+	references persons (personID)
+);
+--SQL FOREIGN KEY on ALTER TABLE
+--To create a FOREIGN KEY constraint on the "PersonID"
+--column when the "Orders" table is already created, 
+--use the following SQL:
+
+--ALTER TABLE Orders
+--ADD FOREIGN KEY (PersonID) REFERENCES Persons(PersonID);
+alter table orders
+add foreign key (personID) references persons(personID);
+
+--To allow naming of a FOREIGN KEY constraint, 
+--and for defining a FOREIGN KEY constraint on multiple columns, 
+--use the following SQL syntax:
+
+--ALTER TABLE Orders
+--ADD CONSTRAINT FK_PersonOrder
+--FOREIGN KEY (PersonID) REFERENCES Persons(PersonID);
+alter table orders
+add constraint 
+fk_personOrder
+foreign key
+(personID)
+references
+persons(personID)
+
+--DROP a FOREIGN KEY Constraint
+--To drop a FOREIGN KEY constraint, use the following SQL:
+
+--ALTER TABLE Orders
+--DROP CONSTRAINT FK_PersonOrder;
+alter table orders
+drop constraint fk_personOrder
+
+--------------------========================================================================================
+
+
+--SQL NOT NULL on CREATE TABLE
+--The following SQL ensures that the "ID", "LastName", and "FirstName" columns will NOT accept NULL values when the "Persons" table is created:
+
+--Example
+
+
+--CREATE TABLE Persons (
+--   ID int NOT NULL,
+--    LastName varchar(255) NOT NULL,
+--   FirstName varchar(255) NOT NULL,
+--   Age int
+--);
+
+
+
+--SQL NOT NULL on ALTER TABLE
+--To create a NOT NULL constraint on the "Age" column when the "Persons" table is already created, use the following SQL:
+
+--ALTER TABLE Persons
+--ALTER COLUMN Age int NOT NULL;
+alter table persons
+alter column Age int not null;
+
+--------------------===============================================================
+
+
+--SQL DEFAULT Constraint
+--The DEFAULT constraint is used to set a default value for a column.
+
+--The default value will be added to all new records, if no other value is specified.
+
+--SQL DEFAULT on CREATE TABLE
+--The following SQL sets a DEFAULT value for the "City" column when the "Persons" table is created:
+
+--CREATE TABLE Persons (
+--   ID int NOT NULL,
+--   LastName varchar(255) NOT NULL,
+--   FirstName varchar(255),
+--   Age int,
+--   City varchar(255) DEFAULT 'Amman'
+--);
+create table mf (
+	id int not null,
+	lastname nvarchar(300) not null,
+	city nvarchar(790) default 'cairo'
+);
+--The DEFAULT constraint can also be used to insert system values,
+--by using functions like GETDATE():
+
+--CREATE TABLE Orders (
+--   ID int NOT NULL,
+--   OrderNumber int NOT NULL,
+--   OrderDate date DEFAULT GETDATE()
+--);
+create table orders (
+	id int not null,
+	ordernumber int not null,
+	orderDate date default getDate()
+);
+--SQL DEFAULT on ALTER TABLE
+--To create a DEFAULT constraint on the "City" column when the table is already created,
+-- use the following SQL:
+
+--ALTER TABLE Persons
+--ADD CONSTRAINT df_City
+--DEFAULT 'Amman' FOR City;
+alter table persons
+add constraint
+df_city
+default
+'cairo'
+for
+city;
+
+
+--DROP a DEFAULT Constraint
+--To drop a DEFAULT constraint, use the following SQL:
+
+--ALTER TABLE Persons
+--DROP Constraint  df_City;
+alter table persons
+drop constraint df_city;
+--------------------===========================================================
+
+--SQL CHECK Constraint
+
+--The CHECK constraint is used to limit the value
+--range that can be placed in a column.
+
+--If you define a CHECK constraint on a column it will allow only certain values for this column.
+
+--If you define a CHECK constraint on a table it can limit the values in certain columns based
+-- on values in other columns in the row.
+
+--SQL CHECK on CREATE TABLE
+--The following SQL creates a CHECK constraint on the "Age" column when the "Persons" table is created.
+-- The CHECK constraint ensures that the age of a person must be 18, or older:
+
+--CREATE TABLE Persons (
+--   ID int NOT NULL,
+--   LastName varchar(255) NOT NULL,
+--   FirstName varchar(255),
+--   Age int CHECK (Age>=18)
+--);
+create table persons33 (
+	id int not null,
+	age int check (age >= 18)
+);
+--To allow naming of a CHECK constraint,
+--and for defining a CHECK constraint on multiple columns, 
+--use the following SQL syntax:
+
+--CREATE TABLE Persons (
+--   ID int NOT NULL,
+--   LastName varchar(255) NOT NULL,
+--   FirstName varchar(255),
+--   Age int,
+--   City varchar(255),
+--   CONSTRAINT CHK_Person CHECK (Age>=18 AND City='Amman')
+--);
+create table perons44 (
+	id int not null,
+	age int,
+	city nvarchar(900),
+	constraint chk_person check (age >= 18 and city = 'cairo')
+);
+--DROP a CHECK Constraint
+--To drop a CHECK constraint, use the following SQL:
+
+--ALTER TABLE Persons
+--DROP CONSTRAINT CHK_Person;
+alter table persons44
+drop constraint chk_person
+--------------------=======================================================
+
+--SQL UNIQUE Constraint
+
+
+
+--The UNIQUE constraint ensures that all values in a column are different.
+
+--Both the UNIQUE and PRIMARY KEY constraints provide
+--a guarantee for uniqueness for a column or set of columns.
+
+--A PRIMARY KEY constraint automatically has a UNIQUE constraint.
+
+--However, you can have many UNIQUE constraints per table, 
+--but only one PRIMARY KEY constraint per table.
+
+
+
+--SQL UNIQUE Constraint on CREATE TABLE
+--The following SQL creates a UNIQUE constraint on the 
+--"ID" column when the "Persons" table is created:
+
+--SQL Server:
+
+--CREATE TABLE Persons (
+--   ID int NOT NULL UNIQUE,
+--   LastName varchar(255) NOT NULL,
+--   FirstName varchar(255),
+--   Age int
+--);
+create table persons55 (
+	id int not null unique,
+	age int
+);
+--To name a UNIQUE constraint,
+--and to define a UNIQUE constraint 
+--on multiple columns, use the following SQL syntax:
+
+--CREATE TABLE Persons (
+--   ID int NOT NULL,
+--   LastName varchar(255) NOT NULL,
+--   FirstName varchar(255),
+--   Age int,
+--   CONSTRAINT UC_Person UNIQUE (ID,LastName)
+--);
+create table persons77 (
+	id int not null,
+	age int,
+	constraint uq_person unique (id,age)
+);
+
+
+--SQL UNIQUE Constraint on ALTER TABLE
+--To create a UNIQUE constraint on the "ID" column when the table is already created,
+-- use the following SQL:
+
+--ALTER TABLE Persons
+--ADD UNIQUE (ID);
+alter table persons77
+add unique (id);
+
+--To name a UNIQUE constraint, 
+--and to define a UNIQUE constraint on multiple columns, 
+--use the following SQL syntax:
+
+--ALTER TABLE Persons
+--ADD CONSTRAINT UC_Person UNIQUE (ID,LastName);
+alter table persons77
+add constraint uq_person unique (id,age);
+
+
+--DROP a UNIQUE Constraint
+--To drop a UNIQUE constraint, use the following SQL:
+
+--SQL Server :
+
+--ALTER TABLE Persons
+--DROP CONSTRAINT UC_Person;
+alter table persons77
+drop constraint uq_person;
+
+--------------------======================================
+
+
+--SQL CREATE INDEX Statement
+
+
+
+--The CREATE INDEX statement is used to create indexes in tables.
+
+--Indexes are used to retrieve data from the database
+--more quickly than otherwise. 
+
+--The users cannot see the indexes, 
+--they are just used to speed up searches/queries.
+
+--Note: Updating a table with indexes takes more time than
+--updating a table without (because the indexes also need an update).
+--So, only create indexes on columns that will be frequently 
+--searched against.
+
+
+
+
+
+--CREATE INDEX Syntax
+--Creates an index on a table. Duplicate values are allowed:
+
+--CREATE INDEX index_name
+--ON table_name (column1, column2, ...);
+create index indexname
+on persons77 (id,age);
+
+
+
+
+
+--CREATE UNIQUE INDEX Syntax
+--Creates a unique index on a table. Duplicate values are not allowed:
+
+--CREATE UNIQUE INDEX index_name
+--ON table_name (column1, column2, ...);
+create unique index indexname2
+on persons77 (id,age)
+
+
+
+
+--CREATE INDEX Example
+--The SQL statement below creates an index named 
+--"idx_lastname" on the "LastName" column in the "Persons" table:
+
+
+--CREATE INDEX idx_lastname
+--ON Persons (LastName);
+create index idx_lastname
+on persons (lastname)
+
+
+--If you want to create an index on a combination of columns,
+--you can list the column names within the parentheses, 
+--separated by commas:
+
+--CREATE INDEX idx_pname
+--ON Persons (LastName, FirstName);
+create index idx_pname
+on persons (lastname,firstname)
+
+
+--DROP INDEX Statement
+--The DROP INDEX statement is used to delete an index in a table.
+
+--DROP INDEX table_name.index_name;
+drop index persons.idx_name
+
+
+
+
+--== SQL Server Clustered Index and Primary key constraint
+
+
+--When you create a table with a primary key,
+--SQL Server automatically creates a 
+--corresponding clustered index that includes primary key columns.
+
+
+
+--Clustered Index is much faster than normal Index.
+
+
+
+--------------------=================================================
+
+
+--What is Normalization?
+--• Normalization is the process of organizing data in a database
+--to reduce redundancy and improve data consistency.
+
+
+--• In other words, it is the process of breaking down a
+--larger database into smaller, more manageable pieces,
+--while ensuring that the data is logically organized and
+--free from redundant information.
+
+
+--• Normalization is achieved by applying a set of rules, 
+--called Normal Forms, to the database tables.
+
+
+--The higher the normal form, the more strictly the rules are applied, 
+--and the more normalized the database is.
+
+
+--• The goal of normalization is to eliminate data anomalies, 
+--such as duplicate or inconsistent data,
+--which can lead to errors and inconsistencies in the database.
+
+
+--• A normalized database is easier to maintain, update and modify, and can be queried more efficiently.
+
+
+-----------------
+--1st Normal Form (1NF)
+
+
+--1. A primary key: A unique identifier for each record in the table.
+
+--2. Atomic values: Each column should contain only a single value, 
+--and each value should be indivisible.
+
+--• Note: Here, atomicity states thatالذرية تنص على  a single 
+--cell cannot hold 
+--multiple values. 
+
+--It must hold only a single-valued attribute.
+
+
+--• The First normal form disallows the multi-valued attribute,
+--composite attribute, and their combinations.
+
+
+
+--3. No repeating groups: Each column should have a distinct name,
+--and there should be no repeating groups of columns.
+
+---------------
+
+--2nd Normal Form (2NF)
+
+
+--Second Normal Form (2NF) is a further level of database
+--normalization that builds on the First Normal Form (1NF) rules.
+
+--It requires that each non-key column in a table be
+--functionally dependent on the entire primary key,
+--not just a part of it.
+
+
+--To satisfy the requirements of 2NF:
+
+
+--1. A table must first be in 1NF, and then have:
+
+
+
+--2. No partial dependencies: 
+--Each non-key column in the table must be fully dependent on
+--the entire primary key.
+
+---------------
+
+
+--3rd Normal Form (3NF)
+
+
+--Third Normal Form (3NF) is a higher level of database normalization
+--that builds on the rules of First Normal Form (1NF) 
+--and Second Normal Form (2NF). 
+
+--It requires that each nonkey column in a table be 
+--dependent only on the primary key, 
+
+--and not on any other non-key columns.
+
+
+--To satisfy the requirements of 3NF:
+
+--1. Table must first be in 1NF and 2NF, and 
+--then have:2. 
+
+--No transitive dependencies: 
+
+--Each non-key column in the table must be dependent only
+--on the primary key, 
+--and not on any other non-key columns.
+
+
+---------------
+
+
+--Boyce-Codd Normal Form (BCNF)
+
+--Rule 1: The table should be in the 3rd Normal Form.
+
+--Rule 2: X should be a superkey for every functional dependency (FD) X−>Y in a given relation. 
+
+---------------
+
+--Fourth Normal Form (4NF)
+--1. It should be in the Boyce-Codd Normal Form (BCNF).
+--2. The table should not have any Multi-valued Dependency.
+---------------
+
+--Fifth Normal Form/Projected Normal Form (5NF)
+--1. A relation should be already in 4NF. 
+--2. It cannot be further non loss decomposed (join dependency).
+--https://www.geeksforgeeks.org/introduction-of-4th-and-5th-normal-form-in-dbms/?ref=lbp
+```

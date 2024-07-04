@@ -1,0 +1,958 @@
+# SQL Problems
+
+```sql copy
+
+
+USE VehicleMakesDB
+GO
+	ALTER AUTHORIZATION ON DATABASE::VehicleMakesDB TO [sa]
+GO
+
+--problem 1
+
+select * from VehicleDetails;
+
+select * from Makes;
+
+select * from MakeModels;
+
+select * from SubModels;
+
+select * from Bodies;
+
+select * from DriveTypes;
+
+select * from FuelTypes;
+
+select * from VehicleMasterDetails;
+
+--Problem 2: Get all vehicles made between 1950 and 2000
+
+select * from VehicleMasterDetails
+where
+Year between 1950 and 2000;
+
+
+-- Problem 3 : Get number vehicles made between 1950 and 2000
+
+select count(*) from VehicleMasterDetails
+where
+Year between 1950 and 2000;
+
+
+--Problem 4 : Get number vehicles made between 1950 and 2000 per make
+--and order them by Number Of Vehicles Descending
+
+select 
+Makes.Make, count(*) as NumberOfVeihcle
+from
+VehicleDetails
+inner join
+Makes
+on
+VehicleDetails.MakeID = Makes.MakeID
+where
+(Year between 1950 and 2000)
+group by
+Makes.Make 
+order by 
+NumberOfVeihcle desc
+
+
+
+--Problem 5 : Get All Makes that have manufactured more than 12000 Vehicles in years 1950 to 2000
+
+-- سليكت على سليكت
+select top 3 * from
+(
+	select 
+	Makes.Make, count(*) as NumberOfVeihcle
+	from
+	VehicleDetails
+	inner join
+	Makes
+	on
+	VehicleDetails.MakeID = Makes.MakeID
+	where
+	(Year between 1950 and 2000)
+	group by
+	Makes.Make 
+	--مينفعش تحط اوردر باي داخل صب كويري
+
+) R1
+
+where R1.NumberOfVeihcle > 12000
+order by
+R1.NumberOfVeihcle desc
+
+
+--نفس اللي فوق مع تعديل بسيط
+select * from
+(
+	select 
+	Makes.Make, count(*) as NumberOfVeihcle
+	from
+	VehicleDetails
+	inner join
+	Makes
+	on
+	VehicleDetails.MakeID = Makes.MakeID
+	where
+	(Year between 1950 and 2000)
+	group by
+	Makes.Make 
+	--مينفعش تحط اوردر باي داخل صب كويري
+
+) R1
+
+where NumberOfVeihcle > 12000
+order by
+R1.NumberOfVeihcle desc
+
+--او تستخدم هافنج لانك استخدمت جروب باي مش هنستخدم هوير
+-- حل اخر باستخدام هافينج لان هافينج على النتائج لكن هوير على الداتا
+select top 3 
+Makes.Make, count(*) as NumberOfVeihcle
+from
+VehicleDetails
+inner join
+Makes
+on
+VehicleDetails.MakeID = Makes.MakeID
+where
+(Year between 1950 and 2000)
+group by
+Makes.Make
+having
+count(*) > 12000
+order by
+count(*) desc;
+
+
+
+-- Problem 6: Get number of vehicles made between 1950 and 2000 per make and add total vehicles column beside
+
+
+select 
+Makes.Make, count(*) as NumberOfVeihcle, totalVehicles = (select count(*) from VehicleDetails)
+from
+VehicleDetails
+inner join
+Makes
+on
+VehicleDetails.MakeID = Makes.MakeID
+where
+(Year between 1950 and 2000)
+group by
+Makes.Make 
+order by 
+NumberOfVeihcle desc
+
+
+
+
+--Problem 7: Get number of vehicles made between 1950 and 2000 per make
+--and add total vehicles column beside it, 
+
+--then calculate it's percentage
+
+select *,
+Pes = cast(NumberOfVeihcle as float)/ cast (totalVehicles as float)--من غير الكاست كانت بتطلعلي اصفار
+from 
+(
+	select 
+	Makes.Make,
+	count(*) as NumberOfVeihcle,
+	totalVehicles = (select count(*) from VehicleDetails)
+	from
+	VehicleDetails
+	inner join
+	Makes
+	on
+	VehicleDetails.MakeID = Makes.MakeID
+	where
+	(Year between 1950 and 2000)
+	group by
+	Makes.Make
+) R1
+order by 
+NumberOfVeihcle desc
+
+
+--Problem 8: 
+--Get 
+--	Make, FuelTypeName and Number of Vehicles 
+--per 
+--	FuelType 
+--per 
+--	Make
+
+select
+Makes.Make,
+FuelTypes.FuelTypeName,
+NumberOfVeihcle = count(*)-- دية هتتحسب من خلال الجروب باي اللي تحت دي
+
+from
+(
+	VehicleDetails
+	inner join
+	Makes
+	on
+	VehicleDetails.MakeID = Makes.MakeID
+
+	inner join
+	FuelTypes
+	on
+	VehicleDetails.FuelTypeID = FuelTypes.FuelTypeID
+)
+
+where (VehicleDetails.Year between 1990 and 2000)
+
+group by
+Makes.Make,
+FuelTypes.FuelTypeName -- نتيجتهم هتتحط في العمود التالي اللي هو بيعد الاستار 
+
+order by 
+Makes.Make
+
+
+
+-- Problem 9: Get all vehicles that runs with GAS
+SELECT 
+VehicleDetails.*, FuelTypes.FuelTypeName
+FROM 
+VehicleDetails 
+INNER JOIN
+FuelTypes ON VehicleDetails.FuelTypeID = FuelTypes.FuelTypeID
+where
+(FuelTypes.FuelTypeName = N'GAS')-- N معناها انه امن لما تستخدم ان فار كار
+
+
+
+--Problem 10: Get all Makes that runs with GAS
+
+--حلي
+
+SELECT       
+Makes.Make, FuelTypes.FuelTypeName
+FROM 
+Makes
+CROSS JOIN 
+FuelTypes
+where 
+FuelTypes.FuelTypeName = N'GAS'
+-- وانا رجعلي 151 ريكورد بس حلي غلط تقريبا
+
+--حل الاستاذ 411 ريكورد رجعله
+
+SELECT distinct        
+Makes.Make, FuelTypes.FuelTypeName
+FROM 
+VehicleDetails
+INNER JOIN
+FuelTypes
+ON
+VehicleDetails.FuelTypeID = FuelTypes.FuelTypeID
+INNER JOIN
+Makes 
+ON
+VehicleDetails.MakeID = Makes.MakeID
+where 
+FuelTypes.FuelTypeName = N'GAS'
+order by Make
+
+
+
+
+--Problem 11: Get Total Makes that runs with GAS عدد الشركات المصنعة لسيارات تشتغل على الجاز
+
+
+--حلي
+
+SELECT count(*) as totalMakesTHatRunsWithGas
+from
+(
+	select distinct
+	Makes.Make, FuelTypes.FuelTypeName
+	FROM 
+	Makes
+	CROSS JOIN 
+	FuelTypes
+	where 
+	FuelTypes.FuelTypeName = N'GAS'
+
+) R1--طبعا دية كانك عملتها تابل فيرتوال طبعا
+
+-- وانا رجعلي 151 ريكورد بس حلي غلط تقريبا
+-- بالبركة مرجع 151 اصلا من البداية
+
+--حل الاستاذ
+SELECT
+totalMakesTHatRunsWithGas =
+count(*) from
+(
+	SELECT distinct        
+	Makes.Make, FuelTypes.FuelTypeName
+	FROM 
+	VehicleDetails
+	INNER JOIN
+	FuelTypes
+	ON
+	VehicleDetails.FuelTypeID = FuelTypes.FuelTypeID
+	INNER JOIN
+	Makes 
+	ON
+	VehicleDetails.MakeID = Makes.MakeID
+	where 
+	FuelTypes.FuelTypeName = N'GAS'
+) R1
+
+
+
+--Problem 12: Count Vehicles by make and order them by NumberOfVehicles from high to low
+
+SELECT  
+Makes.Make, -- المصنعين
+count (*) as -- وعدد اللي صنعوه 
+numberOfVeichels
+FROM          
+Makes 
+INNER JOIN
+VehicleDetails 
+ON 
+Makes.MakeID = VehicleDetails.MakeID
+group by
+Makes.Make
+order by
+numberOfVeichels desc;
+
+
+-- Problem 13: Get all Makes/Count Of Vehicles
+--that manufactures more than 20K Vehicles
+
+
+
+-- الحمدلله حليتها لوحدي
+SELECT  
+Makes.Make,
+count (*) as numberOfVeichels
+FROM          
+Makes 
+INNER JOIN
+VehicleDetails 
+ON 
+Makes.MakeID = VehicleDetails.MakeID
+group by
+Makes.Make
+having
+count (*) > 20000
+order by
+numberOfVeichels desc
+
+
+-- دية حسيتها اسرع
+SELECT top 3      
+Makes.Make,
+count (*) as numberOfVeichels
+FROM          
+Makes 
+INNER JOIN
+VehicleDetails 
+ON 
+Makes.MakeID = VehicleDetails.MakeID
+group by
+Makes.Make
+order by
+numberOfVeichels desc;
+
+
+
+--Problem 14: Get all Makes with make starts with 'B'
+
+select
+Makes.Make
+from
+Makes
+where
+Makes.Make like 'B%'
+
+--Get all  Vehicles with make starts with 'B'
+SELECT        Makes.Make 
+FROM            Makes
+where Makes.Make like 'B%';
+
+
+--15
+
+--Get all  Makes with make ends with 'W'
+SELECT        Makes.Make from Makes
+where Makes.Make like '%W';
+
+
+
+--16 -Get all Makes that manufactures DriveTypeName = FWD
+
+SELECT        distinct Makes.Make, DriveTypes.DriveTypeName
+FROM            DriveTypes INNER JOIN
+                         VehicleDetails ON DriveTypes.DriveTypeID = VehicleDetails.DriveTypeID INNER JOIN
+                         Makes ON VehicleDetails.MakeID = Makes.MakeID
+Where DriveTypes.DriveTypeName ='FWD'
+
+
+
+--17-Get total Makes that Mantufactures DriveTypeName=FWD
+
+select count(*) MakeWithFWD
+from
+(
+	SELECT        distinct Makes.Make, DriveTypes.DriveTypeName
+	FROM            DriveTypes INNER JOIN
+							 VehicleDetails ON DriveTypes.DriveTypeID = VehicleDetails.DriveTypeID INNER JOIN
+							 Makes ON VehicleDetails.MakeID = Makes.MakeID
+	Where DriveTypes.DriveTypeName ='FWD'
+) R1
+
+
+
+
+--18-Get total vehicles per DriveTypeName Per Make and order them per make asc then per total Desc
+
+SELECT        distinct Makes.Make, DriveTypes.DriveTypeName, Count(*) AS Total
+FROM            DriveTypes INNER JOIN
+                         VehicleDetails ON DriveTypes.DriveTypeID = VehicleDetails.DriveTypeID INNER JOIN
+                         Makes ON VehicleDetails.MakeID = Makes.MakeID
+
+Group By Makes.Make, DriveTypes.DriveTypeName
+
+Order By Make ASC, Total Desc
+
+
+
+
+
+--19-Get total vehicles per DriveTypeName Per Make then filter only results with total > 10,000
+
+SELECT        distinct Makes.Make, DriveTypes.DriveTypeName, Count(*) AS Total
+FROM            DriveTypes INNER JOIN
+                         VehicleDetails ON DriveTypes.DriveTypeID = VehicleDetails.DriveTypeID INNER JOIN
+                         Makes ON VehicleDetails.MakeID = Makes.MakeID
+
+Group By Makes.Make, DriveTypes.DriveTypeName
+Having Count(*) > 10000
+
+Order By Make ASC, Total Desc
+
+
+
+
+
+--20-Get all Vehicles that number of doors is not specified
+
+select * from VehicleDetails
+where NumDoors is Null
+
+
+
+
+--21-Get all Vehicles that number of doors is not specified
+
+select count(*) as TotalWithNoSpecifiedDoors from VehicleDetails
+where NumDoors is Null
+
+
+
+--22-Get percentage of vehicles that has no doors specified
+
+select 
+	(
+		CAST(	
+
+			(select count(*) as TotalWithNoSpecifiedDoors from VehicleDetails
+			where NumDoors is Null) 
+		
+		as float)
+
+
+		/
+	
+	
+		Cast( (select count(*) from VehicleDetails as TotalVehicles) as float)
+	
+	
+	) as PercOfNoSpecifiedDoors
+
+
+
+
+
+--23- Get MakeID , Make, SubModelName for all vehicles that have SubModelName 'Elite'
+
+SELECT    distinct    VehicleDetails.MakeID, Makes.Make, SubModelName
+FROM            VehicleDetails INNER JOIN
+                         SubModels ON VehicleDetails.SubModelID = SubModels.SubModelID INNER JOIN
+                         Makes ON VehicleDetails.MakeID = Makes.MakeID
+	
+	where SubModelName='Elite'
+
+
+
+
+-- 24- Get all vehicles that have Engines > 3 Liters and have only 2 doors
+
+	select * from VehicleDetails
+	where Engine_Liter_Display > 3 and NumDoors =2
+
+
+--25- Get  make and vehicles that the engine contains 'OHV' and have Cylinders = 4
+
+SELECT         Makes.Make, VehicleDetails.*
+FROM            VehicleDetails INNER JOIN
+                         Makes ON VehicleDetails.MakeID = Makes.MakeID
+WHERE        (VehicleDetails.Engine LIKE '%OHV%') AND (VehicleDetails.Engine_Cylinders = 4)
+
+
+
+
+
+--26 Get all vehicles that their body is 'Sport Utility' and Year > 2020
+
+SELECT      BodyName,  VehicleDetails.*
+FROM            VehicleDetails INNER JOIN
+                         Bodies ON VehicleDetails.BodyID = Bodies.BodyID
+Where BodyName='Sport Utility' and Year > 2020
+
+
+
+--27- Get all vehicles that their Body is 'Coupe' or 'Hatchback' or 'Sedan'
+
+SELECT       bodyName, VehicleDetails.*
+FROM            VehicleDetails INNER JOIN
+                         Bodies ON VehicleDetails.BodyID = Bodies.BodyID
+Where BodyName in ('Coupe','Hatchback','Sedan')
+
+
+
+
+
+
+--28- Get all vehicles that their body is 'Coupe' or 'Hatchback' or 'Sedan' and manufactured in year  2008 or 2020 or 2021
+
+SELECT       bodyName, VehicleDetails.*
+FROM            VehicleDetails INNER JOIN
+                         Bodies ON VehicleDetails.BodyID = Bodies.BodyID
+Where BodyName in ('Coupe','Hatchback','Sedan') and Year in ( 2008, 2020, 2021)
+
+
+
+
+
+
+--29- Return found=1 if there is any vehicle made in year 1950
+
+select found=1 
+where 
+exists (
+        select top 1 * from VehicleDetails where Year =1950
+      )
+
+
+--30- Get all Vehicle_Display_Name, NumDoors 
+--and add extra column to describe number of doors by words, 
+--and if door is null display 'Not Set'
+
+select 
+Vehicle_Display_Name,
+NumDoors,
+Doordescribtion = 
+case 
+	when NumDoors = 0 then 'No Doors'
+	when NumDoors = 1 then 'One Doors'
+	when NumDoors = 2 then 'Tow Doors'
+	when NumDoors = 3 then 'Three Doors'
+	when NumDoors = 4 then 'Four Doors'
+	when NumDoors = 5 then 'Five Doors'
+	when NumDoors = 6 then 'Six Doors'
+	when NumDoors = 8 then 'Eight Doors'
+	when NumDoors is null then 'Not Set'
+	else 'UnKnown'
+end
+
+from VehicleDetails
+
+
+
+
+
+--31- Get all Vehicle_Display_Name, year and add extra column to calculate the age of the car then sort the results by age desc.
+
+
+-- Note that YEAR in capital Letters is built in function in SQL Server that will give your the year of the given date :-) , 
+-- and the year in small letters is the column name
+
+Select VehicleDetails.Vehicle_Display_Name, Year, Age= YEAR(GetDate()) - VehicleDetails.year
+from VehicleDetails
+Order by Age Desc
+
+
+
+
+--32- Get all Vehicle_Display_Name, year, Age for vehicles that their age between 15 and 25 years old 
+
+select * from
+( 
+	Select VehicleDetails.Vehicle_Display_Name, Year, Age= YEAR(GetDate()) - VehicleDetails.year
+	from VehicleDetails
+) R1
+
+Where Age between 15 and 25
+
+
+
+
+--33- Get Minimum Engine CC , Maximum Engine CC , and Average Engine CC of all Vehicles
+
+select  Min(Engine_CC) as MinimimEngineCC,Max(Engine_CC) as MaximumEngineCC, AVG(Engine_CC)  as AverageEngineCC
+from VehicleDetails
+
+
+
+
+
+-- Get all vehicles that have the minimum Engine_CC
+
+Select VehicleDetails.Vehicle_Display_Name from VehicleDetails
+where Engine_CC = ( select  Min(Engine_CC) as MinEngineCC  from VehicleDetails )
+
+
+
+
+
+
+-- Get all vehicles that have the Maximum Engin_CC
+
+Select VehicleDetails.Vehicle_Display_Name from VehicleDetails
+where Engine_CC = ( select  Max(Engine_CC) as MinEngineCC  from VehicleDetails )
+
+
+
+
+
+
+-- Get all vehicles that have  Engin_CC below average
+
+Select VehicleDetails.Vehicle_Display_Name from VehicleDetails
+where Engine_CC < ( select  avg(Engine_CC) as MinEngineCC  from VehicleDetails )
+
+
+
+
+-- Get total vehicles that have  Engin_CC above average
+
+select Count(*) as NumberOfVehiclesAboveAverageEngineCC from
+(
+ 
+	Select ID,VehicleDetails.Vehicle_Display_Name from VehicleDetails
+	where Engine_CC > ( select  Avg(Engine_CC) as MinEngineCC  from VehicleDetails )
+
+) R1
+
+
+
+
+
+
+-- Get all unique  Engin_CC and sort them Desc
+
+Select  distinct  Engine_CC from VehicleDetails
+Order By Engine_CC Desc
+
+
+
+
+
+-- Get the maximum 3 Engine CC
+
+Select  distinct top 3 Engine_CC from VehicleDetails
+	Order By Engine_CC Desc
+
+
+
+
+-- Get all vehicles that has one of the Max 3 Engine CC
+
+Select Vehicle_Display_Name from VehicleDetails
+where Engine_CC in 
+(
+	
+	Select  distinct top 3 Engine_CC from VehicleDetails
+	Order By Engine_CC Desc
+)
+--ملاحظةةةةة:- هذه الطريقة هي نفسها تستخدمها اذا كان لديك جدول فيه طلاب ومعدلاتهم وطلب منك ان تسترجع العشرة الاوائل
+--العشرة الاوائل ممكن يكونو 15 لانه ممكن ان يكون هنالك علامات مكررة
+--فيجب عليك ان تسترجع اعلى عشرة علامات وبعدها تسترجع الطلاب الذين حصلو على واحده من هذه العلامات
+
+
+
+
+
+-- Get all Makes  that manufactures one of the Max 3 Engine CC
+
+SELECT        distinct Makes.Make
+FROM            VehicleDetails INNER JOIN
+                         Makes ON VehicleDetails.MakeID = Makes.MakeID
+WHERE        (VehicleDetails.Engine_CC IN
+                             (SELECT DISTINCT TOP (3) Engine_CC
+                               FROM            VehicleDetails 
+                               ORDER BY Engine_CC DESC)
+							 )
+
+Order By Make
+
+
+
+
+
+-- Get a table of unique Engine_CC and calculate tax per Engine CC as follows:
+	-- 0 to 1000    Tax = 100
+	-- 1001 to 2000 Tax = 200
+	-- 2001 to 4000 Tax = 300
+	-- 4001 to 6000 Tax = 400
+	-- 6001 to 8000 Tax = 500
+	-- Above 8000   Tax = 600
+	-- Otherwise    Tax = 0
+
+select Engine_CC,
+
+	CASE
+		WHEN Engine_CC between 0 and 1000 THEN 100
+		 WHEN Engine_CC between 1001 and 2000 THEN 200
+		 WHEN Engine_CC between 2001 and 4000 THEN 300
+		 WHEN Engine_CC between 4001 and 6000 THEN 400
+		 WHEN Engine_CC between 6001 and 8000 THEN 500
+		 WHEN Engine_CC > 8000 THEN 600	
+		ELSE 0
+
+	END as Tax
+
+from 
+(
+	select distinct Engine_CC from VehicleDetails
+	
+) R1
+order by Engine_CC
+
+
+
+
+
+
+-- Get Make and Total Number Of Doors Manufactured Per Make
+
+SELECT        Makes.Make, Sum(VehicleDetails.NumDoors) AS TotalNumberOfDoors
+FROM            VehicleDetails INNER JOIN
+                         Makes ON VehicleDetails.MakeID = Makes.MakeID
+
+Group By Make
+Order By TotalNumberOfDoors desc
+
+
+
+
+-- Get Total Number Of Doors Manufactured by 'Ford'
+
+SELECT        Makes.Make, Sum(VehicleDetails.NumDoors) AS TotalNumberOfDoors
+FROM            VehicleDetails INNER JOIN
+                         Makes ON VehicleDetails.MakeID = Makes.MakeID
+
+Group By Make
+Having Make='Ford'
+
+
+
+
+
+-- Get Number of Models Per Make
+
+SELECT        Makes.Make, COUNT(*) AS NumberOfModels
+FROM            Makes INNER JOIN
+                         MakeModels ON Makes.MakeID = MakeModels.MakeID
+GROUP BY Makes.Make
+Order By NumberOfModels Desc
+
+
+
+
+
+-- Get the highest 3 manufacturers that make the highest number of models
+
+SELECT      top 3  Makes.Make, COUNT(*) AS NumberOfModels
+FROM            Makes INNER JOIN
+                         MakeModels ON Makes.MakeID = MakeModels.MakeID
+GROUP BY Makes.Make
+Order By NumberOfModels Desc
+
+
+
+
+
+-- Get the highest number of models manufactured
+
+select Max(NumberOfModels) as MaxNumberOfModels
+from
+(
+
+		SELECT        Makes.Make, COUNT(*) AS NumberOfModels
+		FROM            Makes INNER JOIN
+								 MakeModels ON Makes.MakeID = MakeModels.MakeID
+		GROUP BY Makes.Make
+		
+) R1
+
+
+
+
+-- Get the highest Manufacturers manufactured the highest number of models , 
+-- remember that they could be more than one manufacturer have the same high number of models
+
+
+SELECT        
+Makes.Make, COUNT(*) AS NumberOfModels
+FROM
+Makes 
+INNER JOIN
+ MakeModels ON Makes.MakeID = MakeModels.MakeID
+GROUP BY Makes.Make
+
+having COUNT(*) =
+(
+
+	select Max(NumberOfModels) as MaxNumberOfModels
+	from
+	(
+
+			SELECT      
+			MakeID, COUNT(*) AS NumberOfModels
+			FROM       
+			MakeModels
+			GROUP BY 
+			MakeID
+												
+	) R1
+
+)
+
+
+
+
+-- Get the Lowest  Manufacturers manufactured the lowest number of models , 
+-- remember that they could be more than one manufacturer have the same Lowest  number of models
+
+
+SELECT
+Makes.Make, COUNT(*) AS NumberOfModels
+		FROM            Makes INNER JOIN
+								 MakeModels ON Makes.MakeID = MakeModels.MakeID
+		GROUP BY Makes.Make
+
+		having COUNT(*) = (
+
+										select min(NumberOfModels) as MaxNumberOfModels
+										from
+										(
+
+												SELECT      MakeID, COUNT(*) AS NumberOfModels
+												FROM       
+																		 MakeModels
+												GROUP BY MakeID
+												
+										) R1
+
+							)
+
+
+
+
+
+
+--50- Get all FuelTypes , 
+--each time the result should be showed in random order
+-- Note that the NewID() function will generate GUID for each row 
+
+select * from FuelTypes
+order by NewID()
+
+
+
+
+--======= Self Referential Queries ==========
+restore database EmployeesDB
+from disk = 'c:\EmployeesDB.bak'
+ 
+use EmployeesDB;
+go
+	alter authorization on database::EmployeesDB to [sa]
+go
+
+
+-- Get all employees that have manager along with Manager's name.
+-- this will select all data from employees that are managed by someone along with their manager name, 
+-- employees that have no manager will not be selected because we used inner join 
+-- Note we used inner join on the same table with diffrent alliace.
+
+SELECT        
+Employees.Name, Employees.ManagerID, Employees.Salary, 
+Managers.Name AS ManagerName
+FROM 
+Employees 
+INNER JOIN
+Employees AS Managers
+ON 
+Employees.ManagerID = Managers.EmployeeID
+
+
+
+
+
+-- Get all employees that have manager or does not have manager along with Manager's name, incase no manager name show null
+-- this will select all data from employees regardless if they have manager or not, note here we used left outer join 
+SELECT        Employees.Name, Employees.ManagerID, Employees.Salary, Managers.Name AS ManagerName
+FROM            Employees
+Left JOIN
+                         Employees AS Managers ON Employees.ManagerID = Managers.EmployeeID
+
+
+
+
+-- Get all employees that have manager or does not have manager along with Manager's name,
+--incase no manager name the same employee name as manager to himself
+
+-- this will select all data from employees regardless if they have manager or not, note here we used left outer join 
+SELECT        Employees.Name, Employees.ManagerID, Employees.Salary,  
+  CASE
+    WHEN Managers.Name is Null  THEN Employees.Name
+    ELSE Managers.Name
+END 
+as ManagerName
+FROM            
+Employees
+Left JOIN
+Employees AS Managers
+ON
+Employees.ManagerID = Managers.EmployeeID
+
+
+
+
+--54-last- Get All Employees managed by 'Mohammed'
+
+SELECT        
+Employees.Name, Employees.ManagerID, Employees.Salary, Managers.Name AS ManagerName
+FROM            
+Employees 
+INNER JOIN
+Employees AS Managers ON Employees.ManagerID = Managers.EmployeeID
+where Managers.Name='Mohammed'
+
+
+
+```

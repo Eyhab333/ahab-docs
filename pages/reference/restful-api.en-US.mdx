@@ -1,1 +1,555 @@
-# restful-api
+# RESTful API
+
+**API**: Application Programming Interface.
+
+**RESTful**: Representational State Transfer.
+
+## Win32 API's
+
+• The Win32 API (Application Programming Interface) is a core set of Microsoft Windows operating system interfaces that programmers use to build software applications.
+
+• This API interacts directly with the underlying Windows OS to handle tasks like creating and managing windows, handling user input (like keyboard and mouse events), drawing graphics, and managing files and processes.
+
+
+## Win32 API is divided into several libraries:
+• User32.dll: Manages the standard graphical user interface elements, such as windows, dialogs, and menus.• Gdi32.dll: Handles tasks related to graphics drawing, text output, font management, and other graphical operations.
+
+• Kernel32.dll: Provides core functionalities like memory management, process and thread creation, and file handling.
+
+• Advapi32.dll: Manages advanced services such as registry access, security settings, and service controls.
+
+## Win32 API Examples
+
+- Example 1: Change Desktop Wallpaper
+
+```c# filename="C#" copy
+using System;
+using System.Runtime.InteropServices;
+
+// Import the SystemParametersInfo function from user32.dll
+[DllImport("user32.dll", CharSet = CharSet.Auto)]
+public static extern int SystemParametersInfo(
+    uint action, uint uParam, string vParam, uint winIni);
+
+// Constants for the function
+public static readonly uint SPI_SETDESKWALLPAPER = 0x14;
+public static readonly uint SPIF_UPDATEINIFILE = 0x01;
+public static readonly uint SPIF_SENDCHANGE = 0x02;
+
+public static void SetWallpaper(string path)
+{
+    SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, path, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
+}
+
+// The path to the wallpaper image
+string wallpaperPath = @"C:\pics\newpic.jpg";
+
+// Set the wallpaper
+SetWallpaper(wallpaperPath);
+```
+
+---
+
+- Example 2: Get Screen Resolution
+
+```c# filename="C#" copy
+using System;
+using System.Runtime.InteropServices;
+
+// Import GetSystemMetrics from user32.dll
+[DllImport("user32.dll")]
+static extern int GetSystemMetrics(int nIndex);
+
+int screenWidth = GetSystemMetrics(0);  // SM_CXSCREEN = 0
+int screenHeight = GetSystemMetrics(1); // SM_CYSCREEN = 1
+
+```
+
+---
+
+- Example 3: Battery Info
+
+```c# filename="C#" copy
+using System;
+using System.Runtime.InteropServices;
+
+// Define the SYSTEM_POWER_STATUS structure with fields as per the Windows API documentation
+[StructLayout(LayoutKind.Sequential)]
+public struct SYSTEM_POWER_STATUS
+{
+    public byte ACLineStatus;
+    public byte BatteryFlag;
+    public byte BatteryLifePercent;
+    public byte Reserved1;
+    public int BatteryLifeTime;
+    public int BatteryFullLifeTime;
+}
+
+// Import the GetSystemPowerStatus API from kernel32.dll
+[DllImport("kernel32.dll", SetLastError = true)]
+static extern bool GetSystemPowerStatus(out SYSTEM_POWER_STATUS sps);
+
+// Helper method to decode the BatteryFlag
+static string GetBatteryStatus(byte flag)
+{
+    switch (flag)
+    {
+        case 1:
+            return "High, more than 66% charged";
+        case 2:
+            return "Low, less than 33% charged";
+        case 4:
+            return "Critical, less than 5% charged";
+        case 8:
+            return "Charging";
+        case 128:
+            return "No battery";
+        case 255:
+            return "Unknown status";
+        default:
+            return "Battery status not detected";
+    }
+}
+
+if (GetSystemPowerStatus(out SYSTEM_POWER_STATUS status)){//}
+```
+
+---
+
+- Example 4: Shutdown Windows
+
+```c# filename="C#" copy
+
+using System;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+using System.Security.Principal;
+
+[DllImport("user32.dll", SetLastError = true)]
+public static extern bool ExitWindowsEx(uint uFlags, uint dwReason);
+
+[DllImport("advapi32.dll", SetLastError = true)]
+public static extern bool OpenProcessToken(IntPtr ProcessHandle, uint DesiredAccess, out IntPtr TokenHandle);
+
+[DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+public static extern bool LookupPrivilegeValue(string lpSystemName, string lpName, out LUID lpLuid);
+
+[DllImport("advapi32.dll", SetLastError = true)]
+public static extern bool AdjustTokenPrivileges(IntPtr TokenHandle, bool DisableAllPrivileges, ref TOKEN_PRIVILEGES NewState, int BufferLength, IntPtr PreviousState, IntPtr ReturnLength);
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+internal struct LUID
+{
+    public uint LowPart;
+    public int HighPart;
+}
+
+internal struct TOKEN_PRIVILEGES
+{
+    public int PrivilegeCount;
+    public LUID Luid;
+    public int Attributes;
+}
+
+const int SE_PRIVILEGE_ENABLED = 0x00000002;
+const int TOKEN_QUERY = 0x00000008;
+const int TOKEN_ADJUST_PRIVILEGES = 0x00000020;
+const uint EWX_LOGOFF = 0x00000000;
+const uint EWX_SHUTDOWN = 0x00000001;
+const uint EWX_REBOOT = 0x00000002;
+const uint EWX_FORCE = 0x00000004;
+
+static void EnableShutdownPrivilege()
+{
+    if (!OpenProcessToken(System.Diagnostics.Process.GetCurrentProcess().Handle, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, out IntPtr tokenHandle))
+    {
+        Console.WriteLine("Failed to open process token.");
+        return;
+    }
+
+    if (!LookupPrivilegeValue(null, "SeShutdownPrivilege", out LUID luid))
+    {
+        Console.WriteLine("Failed to look up privilege value.");
+        return;
+    }
+
+    TOKEN_PRIVILEGES tp = new TOKEN_PRIVILEGES
+    {
+        PrivilegeCount = 1,
+        Luid = luid,
+        Attributes = SE_PRIVILEGE_ENABLED
+    };
+
+    if (!AdjustTokenPrivileges(tokenHandle, false, ref tp, 0, IntPtr.Zero, IntPtr.Zero))
+    {
+        Console.WriteLine("Failed to adjust token privileges.");
+        return;
+    }
+}
+
+EnableShutdownPrivilege();
+// Shutdown the system
+if (!ExitWindowsEx(EWX_SHUTDOWN | EWX_FORCE, 0))
+{
+    Console.WriteLine("Shutdown failed!");
+}
+```
+
+---
+
+- Example 5: MessageBox
+
+```c# filename="C#" copy
+using System;
+using System.Runtime.InteropServices;
+
+// Import MessageBox function from user32.dll
+[DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+static extern int MessageBox(IntPtr hWnd, String text, String caption, int type);
+
+MessageBox(IntPtr.Zero, "Hello, World!", "My Message Box", 0);
+```
+
+---
+
+- Example 6: Processes List
+
+```c# filename="C#" copy
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+[DllImport("psapi.dll", SetLastError = true)]
+public static extern bool EnumProcesses([MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U4)][In][Out] uint[] processIds, uint arraySizeBytes, out uint bytesReturned);
+
+[DllImport("psapi.dll", SetLastError = true)]
+public static extern bool GetProcessMemoryInfo(IntPtr hProcess, out PROCESS_MEMORY_COUNTERS counters, uint size);
+
+[DllImport("kernel32.dll", SetLastError = true)]
+public static extern IntPtr OpenProcess(uint processAccess, bool bInheritHandle, uint processId);
+
+[DllImport("kernel32.dll", SetLastError = true)]
+public static extern bool CloseHandle(IntPtr hObject);
+
+[StructLayout(LayoutKind.Sequential)]
+public struct PROCESS_MEMORY_COUNTERS
+{
+    public uint cb;
+    public uint PageFaultCount;
+    public uint PeakWorkingSetSize;
+    public uint WorkingSetSize;
+    public uint QuotaPeakPagedPoolUsage;
+    public uint QuotaPagedPoolUsage;
+    public uint QuotaPeakNonPagedPoolUsage;
+    public uint QuotaNonPagedPoolUsage;
+    public uint PagefileUsage;
+    public uint PeakPagefileUsage;
+}
+
+const int PROCESS_QUERY_INFORMATION = 0x0400;
+const int PROCESS_VM_READ = 0x0010;
+
+uint[] processIds = new uint[1024];
+uint bytesReturned;
+
+if (EnumProcesses(processIds, (uint)processIds.Length * sizeof(uint), out bytesReturned))
+{
+    Console.WriteLine("Number of processes: {0}", bytesReturned / sizeof(uint));
+
+    for (int i = 0; i < bytesReturned / sizeof(uint); i++)
+    {
+        uint pid = processIds[i];
+        IntPtr processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, pid);
+
+        if (processHandle != IntPtr.Zero)
+        {
+            PROCESS_MEMORY_COUNTERS memCounters;
+            if (GetProcessMemoryInfo(processHandle, out memCounters, (uint)Marshal.SizeOf(typeof(PROCESS_MEMORY_COUNTERS))))
+            {
+                string processName = "Unknown";
+                try
+                {
+                    Process proc = Process.GetProcessById((int)pid);
+                    processName = proc.ProcessName;
+                }
+                catch (Exception)
+                {
+                    // Process might have exited or access denied
+                }
+
+                Console.WriteLine($"Process ID: {pid}, Name: {processName} - Memory Usage: {memCounters.WorkingSetSize / 1024} KB");
+            }
+
+            CloseHandle(processHandle);
+        }
+    }
+}
+else
+{
+    Console.WriteLine("Failed to enumerate processes.");
+}
+```
+
+---
+
+- Example 7: Audio API
+
+First, you need to install the NAudio package.
+
+click on `Tools` then `NuGet Package Manager` and select `Package Manager Console`.
+
+```bash copy
+Install-Package NAudio
+```
+
+```c# filename="C#" copy
+using System;
+using NAudio.CoreAudioApi;
+
+var volumeControl = new VolumeControl();
+
+volumeControl.AdjustVolume(0.1f);//increase volume by 10%
+
+float volume = float.Parse(number) / 100.0f;
+volumeControl.SetVolume(volume);
+```
+---
+
+- Example 08: Wifi Networks
+
+```c# filename="C#" copy
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+
+public class WifiScanner
+{
+    [DllImport("Wlanapi.dll")]
+    private static extern uint WlanOpenHandle(uint dwClientVersion, IntPtr pReserved, out uint pdwNegotiatedVersion, out IntPtr phClientHandle);
+
+    [DllImport("Wlanapi.dll")]
+    private static extern uint WlanEnumInterfaces(IntPtr hClientHandle, IntPtr pReserved, out IntPtr ppInterfaceList);
+
+    [DllImport("Wlanapi.dll")]
+    private static extern uint WlanCloseHandle(IntPtr hClientHandle, IntPtr pReserved);
+
+    [DllImport("Wlanapi.dll")]
+    private static extern uint WlanFreeMemory(IntPtr pMemory);
+
+    private IntPtr clientHandle = IntPtr.Zero;
+
+    public WifiScanner()
+    {
+        uint negotiatedVersion;
+        WlanOpenHandle(2, IntPtr.Zero, out negotiatedVersion, out clientHandle);
+    }
+
+    ~WifiScanner()
+    {
+        WlanCloseHandle(clientHandle, IntPtr.Zero);
+    }
+
+    public List<string> GetAvailableNetworks()
+    {
+        IntPtr interfaceList = IntPtr.Zero;
+        WlanEnumInterfaces(clientHandle, IntPtr.Zero, out interfaceList);
+        var listHeader = (WlanInterfaceInfoListHeader)Marshal.PtrToStructure(interfaceList, typeof(WlanInterfaceInfoListHeader));
+        var wlanInterfaceInfo = new WlanInterfaceInfo[listHeader.dwNumberOfItems];
+        List<string> networkList = new List<string>();
+
+        for (int i = 0; i < listHeader.dwNumberOfItems; i++)
+        {
+            IntPtr interfaceInfoPtr = new IntPtr(interfaceList.ToInt64() + (i * Marshal.SizeOf(typeof(WlanInterfaceInfo))) + Marshal.SizeOf(typeof(int)));
+            wlanInterfaceInfo[i] = (WlanInterfaceInfo)Marshal.PtrToStructure(interfaceInfoPtr, typeof(WlanInterfaceInfo));
+            networkList.Add(wlanInterfaceInfo[i].strProfileName);
+        }
+
+        WlanFreeMemory(interfaceList);
+        return networkList;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct WlanInterfaceInfoListHeader
+    {
+        public uint dwNumberOfItems;
+        public uint dwIndex;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct WlanInterfaceInfo
+    {
+        public Guid InterfaceGuid;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        public string strProfileName;
+    }
+}
+
+var wifiScanner = new WifiScanner();
+var networks = wifiScanner.GetAvailableNetworks();
+foreach (var network in networks)
+{
+    Console.WriteLine($"SSID: {network}");
+}
+```
+
+---
+
+- Example 09: Send Email Via OutLook
+
+```c# filename="C#" copy
+using System;
+using Outlook = Microsoft.Office.Interop.Outlook;
+
+try
+{
+    Outlook.Application outlookApp = new Outlook.Application();
+    Outlook.MailItem mailItem = (Outlook.MailItem)outlookApp.CreateItem(Outlook.OlItemType.olMailItem);
+    mailItem.Subject = "Test Email from C#";
+    mailItem.To = "recipient@example.com";  // Change this to the actual recipient's email address
+    mailItem.Body = "Hello, this is a test email sent from a C# application using Outlook Interop.";
+    mailItem.Importance = Outlook.OlImportance.olImportanceHigh;
+    mailItem.Display(false);  // Set to true to display the email before sending
+    mailItem.Send();
+    Console.WriteLine("Email sent successfully!");
+    Console.ReadKey();
+
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Error: " + ex.Message);
+}
+```
+
+---
+
+- Example 10: Create a word Document
+
+```c# filename="C#" copy
+using System;
+using Word = Microsoft.Office.Interop.Word;
+
+Word.Application wordApp = new Word.Application();
+try
+{
+    wordApp.Visible = false;  // Set to true if you want to see Word while the document is being created
+
+    Word.Document doc = wordApp.Documents.Add();  // Create a new document
+    Word.Paragraph para = doc.Paragraphs.Add();   // Add a paragraph
+    para.Range.Text = "Hi, My Name is Mohammed Abu-Hadhoud";  // Your name goes here
+
+    // Save the document
+    string filepath = @"C:\Temp\MyDocument.docx";  // Change the path as needed
+    doc.SaveAs2(filepath);
+    doc.Close();
+
+    Console.WriteLine("Document created successfully at: " + filepath);
+    Console.ReadKey();
+
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Error: " + ex.Message);
+}
+finally
+{
+    wordApp.Quit();  // Close Word application
+}
+```
+
+---
+
+- Example 11: Create an Excel File
+
+```c# filename="C#" copy
+using System;
+using Excel = Microsoft.Office.Interop.Excel;
+
+Excel.Application excelApp = new Excel.Application();
+try
+{
+    if (excelApp == null)
+    {
+        Console.WriteLine("Excel is not properly installed!!");
+        return;
+    }
+
+    excelApp.Visible = true;  // Set to false to run Excel in the background
+
+    // Create a new, empty workbook and add a worksheet
+    Excel.Workbook workbook = excelApp.Workbooks.Add(Type.Missing);
+    Excel.Worksheet worksheet = (Excel.Worksheet)workbook.Worksheets[1];
+    worksheet.Name = "MySheet";
+
+    // Populate the worksheet with numbers 1 to 10
+    for (int i = 1; i <= 10; i++)
+    {
+        worksheet.Cells[i, 1] = i;
+        worksheet.Cells[i, 2] = "Item" + i.ToString();
+
+    }
+
+    // Save the workbook
+    string filepath = @"C:\Temp\MyExcel.xlsx";  // Change the path as needed
+    workbook.SaveAs(filepath);
+    workbook.Close(true);
+    Console.WriteLine("Excel file created successfully at: " + filepath);
+    Console.ReadKey();
+
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Error: " + ex.Message);
+}
+finally
+{
+    excelApp.Quit();  // Close Excel application
+}
+```
+
+---
+
+- Example 12: Create PowerPoint
+
+
+```c# filename="C#" copy
+using System;
+using PowerPoint = Microsoft.Office.Interop.PowerPoint;
+using Core = Microsoft.Office.Core;
+
+PowerPoint.Application pptApplication = new PowerPoint.Application();
+
+try
+{
+    pptApplication.Visible = Core.MsoTriState.msoTrue;
+    PowerPoint.Presentations presentations = pptApplication.Presentations;
+    PowerPoint.Presentation presentation = presentations.Add(Core.MsoTriState.msoTrue);
+
+    // Add a slide
+    PowerPoint.Slides slides = presentation.Slides;
+    PowerPoint.Slide slide = slides.Add(1, PowerPoint.PpSlideLayout.ppLayoutText);
+
+    // Set title
+    PowerPoint.Shape titleShape = slide.Shapes[1];
+    titleShape.TextFrame.TextRange.Text = "Hello, PowerPoint!";
+
+    // Set subtitle
+    PowerPoint.Shape bodyShape = slide.Shapes[2];
+    bodyShape.TextFrame.TextRange.Text = "Created using C#";
+
+    // Save the presentation
+    string filePath = @"C:\Temp\MyPresentation.pptx";
+    presentation.SaveAs(filePath, PowerPoint.PpSaveAsFileType.ppSaveAsDefault, Core.MsoTriState.msoTrue);
+    presentation.Close();
+    Console.WriteLine("Presentation created successfully at: " + filePath);
+    Console.ReadKey();
+
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Error: " + ex.Message);
+}
+finally
+{
+    pptApplication.Quit();
+}
+```
