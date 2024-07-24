@@ -5,6 +5,5 @@
     "oop" : "OOP",
     "data-structures-and-algorithms" : "Data Structures and Algorithms",
     "sql" : "SQL",
-    "restful-api" : "RESTFUL API",
-    "boilerplate" : "Boilerplate"
+    "restful-api" : "RESTFUL API"
 }

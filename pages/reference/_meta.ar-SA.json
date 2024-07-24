@@ -2,10 +2,8 @@
     "mdx" : "MDX",
     "cplusplus-util-classes" : "سي بلس بلس كلاسات مساعدة",
     "oop" : "البرمجة كائنية التوجه",
-    "problem-solving-cplusplus" : "حل المشكلات",
-    "algorithms" : "الخوارزميات",
+    "data-structures-and-algorithms" : "الخوارزميات وهيكلة البيانات",
     "data-structures" : "هيكلة البيانات",
     "sql" : "قواعد البيانات",
-    "restful-api" : "RESTFUL API",
-    "boilerplate" : "Boilerplate"
+    "restful-api" : "RESTFUL API"
 }
