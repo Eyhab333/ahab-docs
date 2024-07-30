@@ -1,10 +1,10 @@
 # AHAB DOCS
 
+https://ahab-docs.vercel.app
+
 > **Note**
 > This app is a work in progress.
 > See the roadmap below.
-
-https://ahab-docs.vercel.app
 
 ## Roadmap
 
