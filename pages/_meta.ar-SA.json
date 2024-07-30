@@ -2,6 +2,12 @@
     "index": {
       "title" : "الرئيسية"
     },
+    "portfolio": {
+      "title" : "بورتفوليو",
+      "type" : "page",
+      "href": "https://ahabfadl.com/",
+      "newWindow": true
+    },
     "contact": {
       "title" : "تواصل معي",
       "type" : "page",

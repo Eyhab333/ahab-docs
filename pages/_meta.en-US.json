@@ -2,6 +2,12 @@
     "index": {
       "title" : "Home"
     },
+    "portfolio": {
+      "title" : "Portfolio",
+      "type" : "page",
+      "href": "https://ahabfadl.com/",
+      "newWindow": true
+    },
     "contact": {
       "title" : "Contact Me",
       "type" : "page",
