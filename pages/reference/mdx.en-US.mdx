@@ -203,6 +203,26 @@ placeholder will be shown by default when loading the images
 
 ---
 
+## Video
+
+```mdx copy
+export function Video() {
+  return (
+    <video width="320" height="auto" controls preload="none">
+      <source src="/videos/outro.mp4" type="video/mp4" />
+      
+      Your browser does not support the video tag.
+    </video>
+  )
+}
+
+<Video/>
+
+
+```
+
+---
+
 ## Headings
 
 Headings are usually created in Markdown with a set of hash (\#) characters placed before the text for the heading, with a space in between (this space is **required** in Gatsby). The number of hashes corresponds to the level of the heading (i.e., \# corresponds to a first-level heading, or the `<h1>` HTML tag).
